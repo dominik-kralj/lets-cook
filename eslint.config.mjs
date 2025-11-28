@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     prettier, // Prettier config, disables conflicting rules
     {
         // Plugins -> External rule packages
+        // Next.js 16 already comes with these rules: eslint-plugin-react, eslint-plugin-react-hooks, @next/eslint-plugin-next
+
         plugins: {
             prettier: prettierPlugin,
             'unused-imports': unusedImports,
@@ -19,7 +21,6 @@ const eslintConfig = defineConfig([
             'simple-import-sort': simpleImportSort,
             boundaries: boundaries,
         },
-        // Next.js 16 already comes with these rules: eslint-plugin-react, eslint-plugin-react-hooks, @next/eslint-plugin-next
 
         rules: {
             'prettier/prettier': 'error',

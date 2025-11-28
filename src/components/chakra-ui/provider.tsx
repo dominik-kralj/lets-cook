@@ -3,8 +3,21 @@
 import { ChakraProvider, defaultSystem } from '@chakra-ui/react';
 
 import { ColorModeProvider, type ColorModeProviderProps } from './color-mode';
+import { useEffect, useState } from 'react';
 
 export function Provider(props: ColorModeProviderProps) {
+    const [mounted, setMounted] = useState(false);
+
+    // Fix for the hydration warning
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) {
+        return null;
+    }
+
     return (
         <ChakraProvider value={defaultSystem}>
             <ColorModeProvider {...props} />
