@@ -13,6 +13,7 @@ export function Provider(props: ColorModeProviderProps) {
     // Fix for the hydration warning
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
     }, []);
 

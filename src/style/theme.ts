@@ -4,10 +4,11 @@ import { colors } from './colors';
 import { buttonRecipe } from './components/buttonRecipe';
 import { cardRecipe } from './components/cardRecipe';
 import { semanticTokens } from './semanticTokens';
+import { spacing } from './spacing';
 
 const config = defineConfig({
     theme: {
-        tokens: { colors },
+        tokens: { colors, spacing },
         semanticTokens,
         recipes: {
             button: buttonRecipe,

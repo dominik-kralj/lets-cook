@@ -23,11 +23,11 @@ export function Header() {
                 alignItems="center"
                 justifyContent="center"
                 flexDir="column"
-                gap={6}
+                gap="component"
             >
-                <VStack gap={6} textAlign="center" color="textAndIcons.onSurfaces.lead">
+                <VStack gap="component" textAlign="center" color="textAndIcons.onSurfaces.lead">
                     <Heading as="h1" fontSize={{ base: '4xl', md: '6xl' }} fontWeight="bold">
-                        Let's Cook
+                        Let&apos;s Cook
                     </Heading>
 
                     <Text
@@ -39,7 +39,7 @@ export function Header() {
                     </Text>
                 </VStack>
 
-                <HStack gap={4}>
+                <HStack gap="element">
                     <Button>
                         Start Cooking
                         <RiArrowRightLine />

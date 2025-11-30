@@ -39,9 +39,6 @@ const eslintConfig = defineConfig([
             // Import sorting
             'simple-import-sort/imports': 'error',
             'simple-import-sort/exports': 'error',
-
-            // Boundaries (configure based on your architecture)
-            'boundaries/element-types': 'off', // Enable after defining boundaries
         },
     },
     globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts']),
