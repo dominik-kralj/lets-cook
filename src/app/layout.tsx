@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
-import { Provider } from '@/components/chakra-ui/provider';
 import { inter } from '@/assets/font';
+import { Provider } from '@/components/chakra-ui/provider';
 
 export const metadata: Metadata = {
     title: "Let's Cook!",

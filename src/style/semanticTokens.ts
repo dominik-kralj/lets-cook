@@ -2,7 +2,7 @@ export const semanticTokens = {
     colors: {
         fills: {
             actionsBrandStrong: {
-                base: {
+                default: {
                     value: { base: '{colors.primary.40}', _dark: '{colors.primary.40}' },
                 },
                 disabled: {
@@ -25,7 +25,7 @@ export const semanticTokens = {
                 },
             },
             actionsBrandWeak: {
-                base: {
+                default: {
                     value: { base: '{colors.neutrals.80}', _dark: '{colors.neutrals.1}' },
                 },
                 hover: {
@@ -36,7 +36,7 @@ export const semanticTokens = {
                 },
             },
             controlsBrand: {
-                base: {
+                default: {
                     value: { base: '{colors.neutrals.90}', _dark: '{colors.primary.40}' },
                 },
                 disabled: {
@@ -77,7 +77,7 @@ export const semanticTokens = {
                     value: { base: '{colors.neutrals.10}', _dark: '{colors.neutrals.50}' },
                 },
                 background: {
-                    value: { base: '{colors.neutrals.0}', _dark: '{colors.neutrals.100}' },
+                    value: { base: '{colors.neutrals.5}', _dark: '{colors.neutrals.90}' },
                 },
                 card: {
                     value: { base: '{colors.neutrals.2}', _dark: '{colors.neutrals.90}' },
@@ -89,7 +89,7 @@ export const semanticTokens = {
         },
         textAndIcons: {
             onActionsBrandPrimary: {
-                base: {
+                default: {
                     value: { base: '{colors.neutrals.100}', _dark: '{colors.neutrals.100}' },
                 },
                 disabled: {
@@ -102,7 +102,7 @@ export const semanticTokens = {
                 },
             },
             onActionsNeutralGhost: {
-                base: {
+                default: {
                     value: { base: '{colors.neutrals.80}', _dark: '{colors.neutrals.0}' },
                 },
                 disabled: {
@@ -110,12 +110,12 @@ export const semanticTokens = {
                 },
             },
             onControlsBrand: {
-                base: {
+                default: {
                     value: { base: '{colors.neutrals.0}', _dark: '{colors.neutrals.100}' },
                 },
             },
             onControlsNeutral: {
-                base: {
+                default: {
                     value: { base: '{colors.neutrals.80}', _dark: '{colors.neutrals.0}' },
                 },
                 disabled: {
@@ -139,7 +139,7 @@ export const semanticTokens = {
         },
         outlines: {
             withActionsBrandWeak: {
-                base: {
+                default: {
                     value: { base: '{colors.neutrals.15}', _dark: '{colors.primary.40}' },
                 },
                 disabled: {
@@ -153,7 +153,7 @@ export const semanticTokens = {
                 },
             },
             withControlsNeutral: {
-                base: {
+                default: {
                     value: { base: '{colors.neutrals.30}', _dark: '{colors.neutrals.30}' },
                 },
                 disabled: {

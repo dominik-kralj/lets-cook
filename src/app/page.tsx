@@ -1,9 +1,17 @@
-import Header from '@/components/homepage/Header';
+import { Container } from '@chakra-ui/react';
+
+import { Body } from '@/components/homepage/Body';
+import { Footer } from '@/components/homepage/Footer';
+import { Header } from '@/components/homepage/Header';
 
 export default function Home() {
     return (
-        <div>
+        <Container p={0} maxW="100%" bg="fills.surfaces.background">
             <Header />
-        </div>
+
+            <Body />
+
+            <Footer />
+        </Container>
     );
 }
