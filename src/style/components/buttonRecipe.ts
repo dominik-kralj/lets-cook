@@ -4,6 +4,7 @@ export const buttonRecipe = defineRecipe({
     base: {
         borderRadius: 'md',
         transition: 'all 0.2s',
+        fontWeight: 'bold',
     },
 
     variants: {
@@ -11,18 +12,56 @@ export const buttonRecipe = defineRecipe({
             solid: {
                 bg: 'fills.actionsBrandStrong.default',
                 color: 'textAndIcons.onControlsBrand.default',
-                fontWeight: 'bold',
+
                 _hover: {
                     bg: 'fills.actionsBrandStrong.hover',
                 },
+                _active: {
+                    bg: 'fills.actionsBrandStrong.pressed',
+                },
+                _focus: {
+                    borderColor: 'outlines.withActionsBrandWeak.focus',
+                },
+                _focusVisible: {
+                    borderColor: 'outlines.withActionsBrandWeak.focus',
+                },
+                _disabled: {
+                    bg: 'fills.actionsBrandStrong.disabled',
+                    color: 'textAndIcons.onActionsBrandPrimary.disabled',
+                    opacity: 0.6,
+                },
+                _pressed: {
+                    bg: 'fills.actionsBrandStrong.pressed',
+                },
             },
             outline: {
+                border: '1px solid',
                 borderColor: 'outlines.withControlsNeutral.default',
                 bg: 'fills.surfaces.background',
                 color: 'textAndIcons.onSurfaces.lead',
+
                 _hover: {
                     bg: 'fills.surfaces.card',
-                    color: 'textAndIcons.onSurfaces.lead',
+                    borderColor: 'outlines.withControlsNeutral.hover',
+                },
+                _active: {
+                    bg: 'fills.controlsNeutral.hover',
+                    borderColor: 'outlines.withControlsNeutral.pressed',
+                },
+                _focus: {
+                    borderColor: 'outlines.withControlsNeutral.focusHeavy',
+                },
+                _focusVisible: {
+                    borderColor: 'outlines.withControlsNeutral.focusHeavy',
+                },
+                _disabled: {
+                    borderColor: 'outlines.withControlsNeutral.disabled',
+                    color: 'textAndIcons.onControlsNeutral.disabled',
+                    opacity: 0.6,
+                },
+                _pressed: {
+                    bg: 'fills.controlsNeutral.hover',
+                    borderColor: 'outlines.withControlsNeutral.pressed',
                 },
             },
         },

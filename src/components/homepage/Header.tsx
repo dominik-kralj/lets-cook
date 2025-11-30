@@ -44,7 +44,7 @@ export function Header() {
                         Start Cooking
                         <RiArrowRightLine />
                     </Button>
-                    <Button variant="outline">See how it works</Button>
+                    <Button variant="outline">Login</Button>
                 </HStack>
             </Flex>
         </Container>
