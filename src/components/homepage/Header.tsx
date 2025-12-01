@@ -2,6 +2,7 @@ import { Box, Button, Container, Flex, Heading, HStack, Text, VStack } from '@ch
 import { RiArrowRightLine } from 'react-icons/ri';
 
 import { Image } from '../ui/Image';
+import { Link } from '../ui/Link';
 
 export function Header() {
     return (
@@ -40,11 +41,18 @@ export function Header() {
                 </VStack>
 
                 <HStack gap="element">
-                    <Button>
-                        Start Cooking
-                        <RiArrowRightLine />
+                    <Button borderRadius="xl">
+                        <Link href="/auth?mode=signup" textDecoration="none">
+                            Start Cooking
+                            <RiArrowRightLine />
+                        </Link>
                     </Button>
-                    <Button variant="outline">Login</Button>
+
+                    <Button variant="outline" borderRadius="xl">
+                        <Link href="/auth?mode=login" textDecoration="none">
+                            Login
+                        </Link>
+                    </Button>
                 </HStack>
             </Flex>
         </Container>

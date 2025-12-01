@@ -52,8 +52,8 @@ export const Body = () => {
     ];
 
     return (
-        <Container>
-            <VStack gap="component" textAlign="center" mb="container">
+        <Container display="flex" flexDir="column" gap="container">
+            <VStack gap="component" textAlign="center">
                 <Heading
                     as="h2"
                     fontSize={{ base: '3xl', md: '5xl' }}
@@ -71,7 +71,7 @@ export const Body = () => {
                 </Text>
             </VStack>
 
-            <SimpleGrid columns={{ base: 1, md: 3 }} gap="component" mb="section">
+            <SimpleGrid columns={{ base: 1, md: 3 }} gap="component">
                 {features.map((feature) => (
                     <Card.Root key={feature.title}>
                         <Card.Body>
