@@ -27,7 +27,7 @@ export function Login() {
             <VStack
                 gap="component"
                 align="stretch"
-                bg="fills.surfaces.card"
+                bg="fills.surfaces.background"
                 p={8}
                 borderRadius="xl"
                 borderWidth="1px"

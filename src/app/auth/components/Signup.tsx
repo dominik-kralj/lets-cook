@@ -2,12 +2,17 @@
 
 import { Button, Container, Field, Heading, Input, Stack, Text, VStack } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { Link } from '@/components/ui/Link';
 import { SignupField, signupSchema } from '@/models/user';
 
+import { signupAction } from '../actions';
+
 export function Signup() {
+    const [serverError, setServerError] = useState<string | null>(null);
+
     const {
         register,
         handleSubmit,
@@ -18,8 +23,19 @@ export function Signup() {
     });
 
     const onSubmit = async (data: SignupField) => {
-        console.log('Signup data:', data);
-        // TODO: Implement signup logic
+        setServerError(null);
+
+        const formData = new FormData();
+        formData.append('username', data.username);
+        formData.append('email', data.email);
+        formData.append('password', data.password);
+        formData.append('confirmPassword', data.confirmPassword);
+
+        const result = await signupAction(formData);
+
+        if (result?.error) {
+            setServerError(result.error);
+        }
     };
 
     return (
@@ -43,39 +59,65 @@ export function Signup() {
                 </VStack>
 
                 <Stack gap="element" as="form" onSubmit={handleSubmit(onSubmit)}>
+                    {serverError && (
+                        <Text color="error.40" fontSize="sm" textAlign="center">
+                            {serverError}
+                        </Text>
+                    )}
+
                     <Field.Root invalid={!!errors.username} required>
-                        <Field.Label color="textAndIcons.onSurfaces.lead">Username</Field.Label>
-                        <Input type="text" placeholder="johndoe" {...register('username')} />
+                        <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
+                            Username
+                        </Field.Label>
+                        <Input
+                            type="text"
+                            placeholder="johndoe"
+                            {...register('username')}
+                            required
+                        />
                         {errors.username && (
                             <Field.ErrorText>{errors.username.message}</Field.ErrorText>
                         )}
                     </Field.Root>
 
                     <Field.Root invalid={!!errors.email} required>
-                        <Field.Label color="textAndIcons.onSurfaces.lead">Email</Field.Label>
-                        <Input type="email" placeholder="your@email.com" {...register('email')} />
+                        <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
+                            Email
+                        </Field.Label>
+                        <Input
+                            type="email"
+                            placeholder="your@email.com"
+                            {...register('email')}
+                            required
+                        />
                         {errors.email && <Field.ErrorText>{errors.email.message}</Field.ErrorText>}
                     </Field.Root>
 
                     <Field.Root invalid={!!errors.password} required>
-                        <Field.Label color="textAndIcons.onSurfaces.lead">Password</Field.Label>
-                        <Input type="password" placeholder="••••••••" {...register('password')} />
+                        <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
+                            Password
+                        </Field.Label>
+                        <Input
+                            type="password"
+                            placeholder="••••••••"
+                            {...register('password')}
+                            required
+                        />
                         {errors.password && (
                             <Field.ErrorText>{errors.password.message}</Field.ErrorText>
                         )}
                     </Field.Root>
 
                     <Field.Root invalid={!!errors.confirmPassword} required>
-                        <Field.Label color="textAndIcons.onSurfaces.lead">
+                        <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
                             Confirm Password
                         </Field.Label>
-
                         <Input
                             type="password"
                             placeholder="••••••••"
                             {...register('confirmPassword')}
+                            required
                         />
-
                         {errors.confirmPassword && (
                             <Field.ErrorText>{errors.confirmPassword.message}</Field.ErrorText>
                         )}
@@ -84,6 +126,8 @@ export function Signup() {
                     <Button
                         type="submit"
                         size="lg"
+                        width="full"
+                        mt="element"
                         loading={isSubmitting}
                         disabled={!isDirty || !isValid || isSubmitting}
                     >
