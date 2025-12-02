@@ -2,24 +2,39 @@
 
 import { Button, Container, Field, Heading, Input, Stack, Text, VStack } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
+import { startTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { Link } from '@/components/ui/Link';
 import { LoginField, loginSchema } from '@/models/user';
 
+import { loginAction } from '../actions';
+
 export function Login() {
+    const { push } = useRouter();
+
     const {
         register,
         handleSubmit,
         formState: { errors, isSubmitting, isValid, isDirty },
+        reset,
     } = useForm<LoginField>({
         resolver: zodResolver(loginSchema),
         mode: 'onBlur',
     });
 
-    const onSubmit = async (data: LoginField) => {
-        console.log('Login data:', data);
-        // TODO: Implement login logic
+    const onSubmit = (data: LoginField) => {
+        startTransition(async () => {
+            try {
+                await loginAction(data);
+
+                reset();
+                push('/dashboard');
+            } catch (error: unknown) {
+                console.error(error);
+            }
+        });
     };
 
     return (
@@ -27,7 +42,7 @@ export function Login() {
             <VStack
                 gap="component"
                 align="stretch"
-                bg="fills.surfaces.background"
+                bg="fills.surfaces.card"
                 p={8}
                 borderRadius="xl"
                 borderWidth="1px"
@@ -44,14 +59,28 @@ export function Login() {
 
                 <Stack gap="element" as="form" onSubmit={handleSubmit(onSubmit)}>
                     <Field.Root invalid={!!errors.email} required>
-                        <Field.Label color="textAndIcons.onSurfaces.lead">Email</Field.Label>
-                        <Input type="email" placeholder="your@email.com" {...register('email')} />
+                        <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
+                            Email
+                        </Field.Label>
+                        <Input
+                            type="email"
+                            placeholder="your@email.com"
+                            {...register('email')}
+                            required
+                        />
                         {errors.email && <Field.ErrorText>{errors.email.message}</Field.ErrorText>}
                     </Field.Root>
 
                     <Field.Root invalid={!!errors.password} required>
-                        <Field.Label color="textAndIcons.onSurfaces.lead">Password</Field.Label>
-                        <Input type="password" placeholder="••••••••" {...register('password')} />
+                        <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
+                            Password
+                        </Field.Label>
+                        <Input
+                            type="password"
+                            placeholder="••••••••"
+                            {...register('password')}
+                            required
+                        />
                         {errors.password && (
                             <Field.ErrorText>{errors.password.message}</Field.ErrorText>
                         )}
@@ -69,6 +98,8 @@ export function Login() {
                     <Button
                         type="submit"
                         size="lg"
+                        width="full"
+                        mt="element"
                         loading={isSubmitting}
                         disabled={!isDirty || !isValid || isSubmitting}
                     >

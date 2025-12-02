@@ -1,61 +1,93 @@
 'use server';
 
-import { hash } from 'bcryptjs';
-import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
+import { type LoginField, loginSchema, type SignupField, signupSchema } from '@/models/user';
 
-import prisma from '@/lib/db';
-import { signupSchema } from '@/models/user';
-
-export async function signupAction(formData: FormData) {
-    const data = {
-        username: formData.get('username'),
-        email: formData.get('email'),
-        password: formData.get('password'),
-        confirmPassword: formData.get('confirmPassword'),
-    };
-
-    // Validate with Zod
+export async function signupAction(data: SignupField) {
     const result = signupSchema.safeParse(data);
 
     if (!result.success) {
         return {
-            error: result.error.errors[0].message,
+            error: result.error.issues[0].message,
         };
     }
 
     const { username, email, password } = result.data;
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findFirst({
-        where: {
-            OR: [{ email }, { username }],
+    const supabase = await createClient();
+
+    const { error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+            data: {
+                username,
+            },
         },
     });
 
-    if (existingUser) {
+    if (authError) {
         return {
-            error: existingUser.email === email ? 'Email already in use' : 'Username already taken',
+            error: authError.message,
         };
     }
 
-    // Hash password
-    const hashedPassword = await hash(password, 10);
+    return { success: true };
+}
 
-    // Create user
-    try {
-        await prisma.user.create({
-            data: {
-                username,
-                email,
-                password: hashedPassword,
-            },
-        });
+export async function loginAction(data: LoginField) {
+    const result = loginSchema.safeParse(data);
 
-        // Redirect to login after successful signup
-        redirect('/auth?mode=login');
-    } catch (error) {
+    if (!result.success) {
         return {
-            error: 'Failed to create account. Please try again.',
+            error: result.error.issues[0].message,
         };
     }
+
+    const { email, password } = result.data;
+
+    const supabase = await createClient();
+
+    const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+    });
+
+    if (authError) {
+        return {
+            error: 'Invalid email or password',
+        };
+    }
+
+    return { success: true };
+}
+
+export async function logoutAction() {
+    const supabase = await createClient();
+
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+        return {
+            error: error.message,
+        };
+    }
+
+    return { success: true };
+}
+
+export async function forgotPasswordAction(email: string) {
+    const supabase = await createClient();
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/reset-password`,
+    });
+
+    if (error) {
+        return {
+            error: error.message,
+        };
+    }
+
+    return { success: true };
 }

@@ -2,7 +2,8 @@
 
 import { Button, Container, Field, Heading, Input, Stack, Text, VStack } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { startTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { Link } from '@/components/ui/Link';
@@ -11,31 +12,29 @@ import { SignupField, signupSchema } from '@/models/user';
 import { signupAction } from '../actions';
 
 export function Signup() {
-    const [serverError, setServerError] = useState<string | null>(null);
+    const router = useRouter();
 
     const {
         register,
         handleSubmit,
         formState: { errors, isSubmitting, isValid, isDirty },
+        reset,
     } = useForm<SignupField>({
         resolver: zodResolver(signupSchema),
         mode: 'onBlur',
     });
 
-    const onSubmit = async (data: SignupField) => {
-        setServerError(null);
+    const onSubmit = (data: SignupField) => {
+        startTransition(async () => {
+            try {
+                await signupAction(data);
 
-        const formData = new FormData();
-        formData.append('username', data.username);
-        formData.append('email', data.email);
-        formData.append('password', data.password);
-        formData.append('confirmPassword', data.confirmPassword);
-
-        const result = await signupAction(formData);
-
-        if (result?.error) {
-            setServerError(result.error);
-        }
+                reset();
+                router.push('/auth?mode=login');
+            } catch (error: unknown) {
+                console.error('Error caught:', error);
+            }
+        });
     };
 
     return (
@@ -43,7 +42,7 @@ export function Signup() {
             <VStack
                 gap="component"
                 align="stretch"
-                bg="fills.surfaces.card"
+                bg="fills.surfaces.background"
                 p={8}
                 borderRadius="xl"
                 borderWidth="1px"
@@ -59,12 +58,6 @@ export function Signup() {
                 </VStack>
 
                 <Stack gap="element" as="form" onSubmit={handleSubmit(onSubmit)}>
-                    {serverError && (
-                        <Text color="error.40" fontSize="sm" textAlign="center">
-                            {serverError}
-                        </Text>
-                    )}
-
                     <Field.Root invalid={!!errors.username} required>
                         <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
                             Username
