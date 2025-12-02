@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 
 import { inter } from '@/assets/font';
 import { Provider } from '@/components/chakra-ui/provider';
+import { Toaster } from '@/components/chakra-ui/toaster';
 import { Footer } from '@/components/homepage/Footer';
 
 export const metadata: Metadata = {
@@ -22,6 +23,7 @@ export default function RootLayout({
                         {children}
                         <Footer />
                     </Flex>
+                    <Toaster />
                 </Provider>
             </body>
         </html>

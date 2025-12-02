@@ -9,7 +9,7 @@ interface HeaderProps {
 
 export function Header({ children }: HeaderProps) {
     return (
-        <Box as="header" borderBottomWidth="1px" py={4} px={6} bg="fills.surfaces.card">
+        <Box as="header" borderBottomWidth="1px" p={6} bg="fills.surfaces.card">
             <HStack maxW="container.xl" mx="auto" justify="space-between">
                 <Link href="/">
                     <HStack gap={2}>

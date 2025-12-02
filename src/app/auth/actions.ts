@@ -1,5 +1,6 @@
 'use server';
 
+import prisma from '@/lib/db';
 import { createClient } from '@/lib/supabase/server';
 import { type LoginField, loginSchema, type SignupField, signupSchema } from '@/models/user';
 
@@ -13,6 +14,16 @@ export async function signupAction(data: SignupField) {
     }
 
     const { username, email, password } = result.data;
+
+    const existingUser = await prisma.user.findUnique({
+        where: { username },
+    });
+
+    if (existingUser) {
+        return {
+            error: 'Username is already taken',
+        };
+    }
 
     const supabase = await createClient();
 

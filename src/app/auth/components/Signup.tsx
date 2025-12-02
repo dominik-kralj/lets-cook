@@ -3,9 +3,9 @@
 import { Button, Container, Field, Heading, Input, Stack, Text, VStack } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { startTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
+import { toaster } from '@/components/chakra-ui/toaster';
 import { Link } from '@/components/ui/Link';
 import { SignupField, signupSchema } from '@/models/user';
 
@@ -24,17 +24,35 @@ export function Signup() {
         mode: 'onBlur',
     });
 
-    const onSubmit = (data: SignupField) => {
-        startTransition(async () => {
-            try {
-                await signupAction(data);
+    const onSubmit = async (data: SignupField) => {
+        try {
+            const response = await signupAction(data);
 
-                reset();
-                router.push('/auth?mode=login');
-            } catch (error: unknown) {
-                console.error('Error caught:', error);
+            if (response?.error) {
+                toaster.create({
+                    title: 'Signup failed',
+                    description: response.error,
+                    type: 'error',
+                });
+                return;
             }
-        });
+
+            toaster.create({
+                title: 'Account created successfully!',
+                description: 'Please check your email to confirm your account.',
+                type: 'success',
+            });
+
+            reset();
+            router.push('/auth?mode=login');
+        } catch (error: unknown) {
+            console.error('Error caught:', error);
+            toaster.create({
+                title: 'Something went wrong',
+                description: 'Please try again later.',
+                type: 'error',
+            });
+        }
     };
 
     return (

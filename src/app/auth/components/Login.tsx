@@ -3,7 +3,6 @@
 import { Button, Container, Field, Heading, Input, Stack, Text, VStack } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { startTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { Link } from '@/components/ui/Link';
@@ -24,17 +23,15 @@ export function Login() {
         mode: 'onBlur',
     });
 
-    const onSubmit = (data: LoginField) => {
-        startTransition(async () => {
-            try {
-                await loginAction(data);
+    const onSubmit = async (data: LoginField) => {
+        try {
+            await loginAction(data);
 
-                reset();
-                push('/dashboard');
-            } catch (error: unknown) {
-                console.error(error);
-            }
-        });
+            reset();
+            push('/dashboard');
+        } catch (error: unknown) {
+            console.error(error);
+        }
     };
 
     return (
@@ -86,14 +83,14 @@ export function Login() {
                         )}
                     </Field.Root>
 
-                    <Link
+                    {/* <Link
                         href="#"
                         textAlign="right"
                         color="fills.actionsBrandStrong.default"
                         fontSize="sm"
                     >
                         Forgot password?
-                    </Link>
+                    </Link> */}
 
                     <Button
                         type="submit"
