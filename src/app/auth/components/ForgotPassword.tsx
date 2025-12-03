@@ -7,30 +7,29 @@ import { useForm } from 'react-hook-form';
 
 import { toaster } from '@/components/chakra-ui/toaster';
 import { Link } from '@/components/ui/Link';
-import { LoginDto, loginSchema } from '@/models/user';
+import { ForgotPasswordDto, forgotPasswordSchema } from '@/models/user';
 
-import { loginAction } from '../actions';
+import { forgotPasswordAction } from '../actions';
 
-export function Login() {
+export function ForgotPassword() {
     const router = useRouter();
 
     const {
         register,
         handleSubmit,
         formState: { errors, isSubmitting, isValid, isDirty },
-        reset,
-    } = useForm<LoginDto>({
-        resolver: zodResolver(loginSchema),
+    } = useForm<ForgotPasswordDto>({
+        resolver: zodResolver(forgotPasswordSchema),
         mode: 'onBlur',
     });
 
-    const onSubmit = async (data: LoginDto) => {
+    const onSubmit = async (data: ForgotPasswordDto) => {
         try {
-            const response = await loginAction(data);
+            const response = await forgotPasswordAction(data.email);
 
             if (response?.error) {
                 toaster.create({
-                    title: 'Login failed',
+                    title: 'Failed to send reset email',
                     description: response.error,
                     type: 'error',
                 });
@@ -38,14 +37,12 @@ export function Login() {
             }
 
             toaster.create({
-                title: 'Welcome back!',
-                description: 'You have successfully logged in.',
+                title: 'Check your email',
+                description: 'We sent you a password reset link.',
                 type: 'success',
             });
 
-            reset();
-            router.push('/dashboard');
-            router.refresh();
+            router.push('/auth?mode=login');
         } catch (error: unknown) {
             console.error('Error caught:', error);
             toaster.create({
@@ -61,11 +58,11 @@ export function Login() {
             <VStack gap="component" align="stretch" p={8} borderRadius="xl" borderWidth="1px">
                 <VStack gap="element" textAlign="center">
                     <Heading as="h2" fontSize="4xl" color="textAndIcons.onSurfaces.lead">
-                        Welcome Back
+                        Forgot Password?
                     </Heading>
 
                     <Text color="textAndIcons.onSurfaces.helper">
-                        Log in to access your recipes
+                        Enter your email and we&apos;ll send you a reset link
                     </Text>
                 </VStack>
 
@@ -83,30 +80,6 @@ export function Login() {
                         {errors.email && <Field.ErrorText>{errors.email.message}</Field.ErrorText>}
                     </Field.Root>
 
-                    <Field.Root invalid={!!errors.password} required>
-                        <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
-                            Password
-                        </Field.Label>
-                        <Input
-                            type="password"
-                            placeholder="••••••••"
-                            {...register('password')}
-                            required
-                        />
-                        {errors.password && (
-                            <Field.ErrorText>{errors.password.message}</Field.ErrorText>
-                        )}
-                    </Field.Root>
-
-                    <Link
-                        href="/auth/forgot-password"
-                        textAlign="right"
-                        color="fills.actionsBrandStrong.default"
-                        fontSize="sm"
-                    >
-                        Forgot password?
-                    </Link>
-
                     <Button
                         type="submit"
                         size="lg"
@@ -115,14 +88,14 @@ export function Login() {
                         loading={isSubmitting}
                         disabled={!isDirty || !isValid || isSubmitting}
                     >
-                        Log In
+                        Send Reset Link
                     </Button>
                 </Stack>
 
                 <Text textAlign="center" color="textAndIcons.onSurfaces.helper" fontSize="sm">
-                    Don&apos;t have an account?{' '}
-                    <Link href="/auth?mode=signup" color="fills.actionsBrandStrong.default">
-                        Sign up
+                    Remember your password?{' '}
+                    <Link href="/auth?mode=login" color="fills.actionsBrandStrong.default">
+                        Log in
                     </Link>
                 </Text>
             </VStack>

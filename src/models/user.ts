@@ -24,5 +24,21 @@ export const signupSchema = z
         path: ['confirmPassword'],
     });
 
-export type LoginField = z.infer<typeof loginSchema>;
-export type SignupField = z.infer<typeof signupSchema>;
+export const forgotPasswordSchema = z.object({
+    email: z.email('Please enter a valid email address'),
+});
+
+export const resetPasswordSchema = z
+    .object({
+        password: z.string().min(8, 'Password must be at least 8 characters'),
+        confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+        message: "Passwords don't match",
+        path: ['confirmPassword'],
+    });
+
+export type LoginDto = z.infer<typeof loginSchema>;
+export type SignupDto = z.infer<typeof signupSchema>;
+export type ForgotPasswordDto = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordDto = z.infer<typeof resetPasswordSchema>;

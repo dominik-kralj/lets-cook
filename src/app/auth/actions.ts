@@ -1,10 +1,11 @@
 'use server';
 
-import prisma from '@/lib/db';
+import { AUTH_ERRORS } from '@/lib/errors';
+import prisma from '@/lib/prisma/db';
 import { createClient } from '@/lib/supabase/server';
-import { type LoginField, loginSchema, type SignupField, signupSchema } from '@/models/user';
+import { type LoginDto, loginSchema, type SignupDto, signupSchema } from '@/models/user';
 
-export async function signupAction(data: SignupField) {
+export async function signupAction(data: SignupDto) {
     const result = signupSchema.safeParse(data);
 
     if (!result.success) {
@@ -15,19 +16,26 @@ export async function signupAction(data: SignupField) {
 
     const { username, email, password } = result.data;
 
-    const existingUser = await prisma.user.findUnique({
-        where: { username },
+    // Check for existing user
+    const existingUser = await prisma.user.findFirst({
+        where: {
+            OR: [{ username }, { email }],
+        },
     });
 
     if (existingUser) {
         return {
-            error: 'Username is already taken',
+            error:
+                existingUser.email === email
+                    ? AUTH_ERRORS.EMAIL_IN_USE
+                    : AUTH_ERRORS.USERNAME_TAKEN,
+            field: existingUser.email === email ? 'email' : 'username',
         };
     }
 
     const supabase = await createClient();
 
-    const { error: authError } = await supabase.auth.signUp({
+    const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -43,10 +51,28 @@ export async function signupAction(data: SignupField) {
         };
     }
 
+    if (authData.user) {
+        try {
+            await prisma.user.create({
+                data: {
+                    id: authData.user.id,
+                    username,
+                    email,
+                },
+            });
+        } catch (error) {
+            console.error('Failed to create user record:', error);
+
+            return {
+                error: AUTH_ERRORS.ACCOUNT_CREATION_FAILED,
+            };
+        }
+    }
+
     return { success: true };
 }
 
-export async function loginAction(data: LoginField) {
+export async function loginAction(data: LoginDto) {
     const result = loginSchema.safeParse(data);
 
     if (!result.success) {
@@ -66,7 +92,7 @@ export async function loginAction(data: LoginField) {
 
     if (authError) {
         return {
-            error: 'Invalid email or password',
+            error: AUTH_ERRORS.INVALID_CREDENTIALS,
         };
     }
 
@@ -92,6 +118,22 @@ export async function forgotPasswordAction(email: string) {
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/reset-password`,
+    });
+
+    if (error) {
+        return {
+            error: error.message,
+        };
+    }
+
+    return { success: true };
+}
+
+export async function resetPasswordAction(newPassword: string) {
+    const supabase = await createClient();
+
+    const { error } = await supabase.auth.updateUser({
+        password: newPassword,
     });
 
     if (error) {

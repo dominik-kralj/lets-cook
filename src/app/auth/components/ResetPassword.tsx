@@ -1,62 +1,67 @@
+// src/app/auth/components/ResetPassword.tsx
 'use client';
 
 import { Button, Container, Field, Heading, Input, Stack, Text, VStack } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { toaster } from '@/components/chakra-ui/toaster';
 import { Link } from '@/components/ui/Link';
-import { SignupDto, signupSchema } from '@/models/user';
+import { ResetPasswordDto, resetPasswordSchema } from '@/models/user';
 
-import { signupAction } from '../actions';
+import { resetPasswordAction } from '../actions';
 
-export function Signup() {
+export function ResetPassword() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const [isValidToken, setIsValidToken] = useState(true);
+
+    const code = searchParams.get('code');
+
+    useEffect(() => {
+        if (!code) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setIsValidToken(false);
+            toaster.create({
+                title: 'Invalid reset link',
+                description: 'Please request a new password reset link.',
+                type: 'error',
+            });
+        }
+    }, [code]);
 
     const {
         register,
         handleSubmit,
         formState: { errors, isSubmitting, isValid, isDirty },
-        reset,
-        setError,
-    } = useForm<SignupDto>({
-        resolver: zodResolver(signupSchema),
+    } = useForm<ResetPasswordDto>({
+        resolver: zodResolver(resetPasswordSchema),
         mode: 'onBlur',
     });
 
-    const onSubmit = async (data: SignupDto) => {
+    const onSubmit = async (data: ResetPasswordDto) => {
+        if (!code) return;
+
         try {
-            const response = await signupAction(data);
+            const response = await resetPasswordAction(data.password);
 
             if (response?.error) {
-                if (response.field === 'email') {
-                    setError('email', {
-                        type: 'manual',
-                        message: response.error,
-                    });
-                } else if (response.field === 'username') {
-                    setError('username', {
-                        type: 'manual',
-                        message: response.error,
-                    });
-                } else {
-                    toaster.create({
-                        title: 'Signup failed',
-                        description: response.error,
-                        type: 'error',
-                    });
-                }
+                toaster.create({
+                    title: 'Failed to reset password',
+                    description: response.error,
+                    type: 'error',
+                });
                 return;
             }
 
             toaster.create({
-                title: 'Account created successfully!',
-                description: 'Please check your email to confirm your account.',
+                title: 'Password updated!',
+                description: 'You can now log in with your new password.',
                 type: 'success',
             });
 
-            reset();
             router.push('/auth?mode=login');
         } catch (error: unknown) {
             console.error('Error caught:', error);
@@ -68,51 +73,45 @@ export function Signup() {
         }
     };
 
+    if (!isValidToken) {
+        return (
+            <Container maxW="md">
+                <VStack gap="component" align="stretch" p={8} borderRadius="xl" borderWidth="1px">
+                    <VStack gap="element" textAlign="center">
+                        <Heading as="h2" fontSize="4xl" color="textAndIcons.onSurfaces.lead">
+                            Invalid Link
+                        </Heading>
+                        <Text color="textAndIcons.onSurfaces.helper">
+                            This password reset link is invalid or has expired.
+                        </Text>
+                    </VStack>
+
+                    <Link href="/auth/forgot-password">
+                        <Button size="lg" width="full">
+                            Request New Link
+                        </Button>
+                    </Link>
+                </VStack>
+            </Container>
+        );
+    }
+
     return (
         <Container maxW="md">
             <VStack gap="component" align="stretch" p={8} borderRadius="xl" borderWidth="1px">
                 <VStack gap="element" textAlign="center">
                     <Heading as="h2" fontSize="4xl" color="textAndIcons.onSurfaces.lead">
-                        Create Account
+                        Reset Password
                     </Heading>
-
                     <Text color="textAndIcons.onSurfaces.helper">
-                        Start organizing your recipes today
+                        Enter your new password below
                     </Text>
                 </VStack>
 
                 <Stack gap="element" as="form" onSubmit={handleSubmit(onSubmit)}>
-                    <Field.Root invalid={!!errors.username} required>
-                        <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
-                            Username
-                        </Field.Label>
-                        <Input
-                            type="text"
-                            placeholder="johndoe"
-                            {...register('username')}
-                            required
-                        />
-                        {errors.username && (
-                            <Field.ErrorText>{errors.username.message}</Field.ErrorText>
-                        )}
-                    </Field.Root>
-
-                    <Field.Root invalid={!!errors.email} required>
-                        <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
-                            Email
-                        </Field.Label>
-                        <Input
-                            type="email"
-                            placeholder="your@email.com"
-                            {...register('email')}
-                            required
-                        />
-                        {errors.email && <Field.ErrorText>{errors.email.message}</Field.ErrorText>}
-                    </Field.Root>
-
                     <Field.Root invalid={!!errors.password} required>
                         <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
-                            Password
+                            New Password
                         </Field.Label>
                         <Input
                             type="password"
@@ -127,7 +126,7 @@ export function Signup() {
 
                     <Field.Root invalid={!!errors.confirmPassword} required>
                         <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
-                            Confirm Password
+                            Confirm New Password
                         </Field.Label>
                         <Input
                             type="password"
@@ -148,12 +147,12 @@ export function Signup() {
                         loading={isSubmitting}
                         disabled={!isDirty || !isValid || isSubmitting}
                     >
-                        Sign Up
+                        Reset Password
                     </Button>
                 </Stack>
 
                 <Text textAlign="center" color="textAndIcons.onSurfaces.helper" fontSize="sm">
-                    Already have an account?{' '}
+                    Remember your password?{' '}
                     <Link href="/auth?mode=login" color="fills.actionsBrandStrong.default">
                         Log in
                     </Link>
