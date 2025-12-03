@@ -1,11 +1,12 @@
 'use client';
 
-import { Button, Container, Field, Heading, Input, Stack, Text, VStack } from '@chakra-ui/react';
+import { Field, Input } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
 import { toaster } from '@/components/chakra-ui/toaster';
+import { FormCard } from '@/components/ui/FormCard';
 import { Link } from '@/components/ui/Link';
 import { LoginDto, loginSchema } from '@/models/user';
 
@@ -57,75 +58,41 @@ export function Login() {
     };
 
     return (
-        <Container maxW="md">
-            <VStack gap="component" align="stretch" p={8} borderRadius="xl" borderWidth="1px">
-                <VStack gap="element" textAlign="center">
-                    <Heading as="h2" fontSize="4xl" color="textAndIcons.onSurfaces.lead">
-                        Welcome Back
-                    </Heading>
+        <FormCard
+            title="Welcome Back"
+            subtitle="Log in to access your recipes"
+            onSubmit={handleSubmit(onSubmit)}
+            submitButtonText="Log In"
+            isSubmitting={isSubmitting}
+            isDisabled={!isDirty || !isValid || isSubmitting}
+            footerText="Don't have an account?"
+            footerLinkText="Sign up"
+            footerLinkHref="/auth?mode=signup"
+        >
+            <Field.Root invalid={!!errors.email} required>
+                <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
+                    Email
+                </Field.Label>
+                <Input type="email" placeholder="your@email.com" {...register('email')} required />
+                {errors.email && <Field.ErrorText>{errors.email.message}</Field.ErrorText>}
+            </Field.Root>
 
-                    <Text color="textAndIcons.onSurfaces.helper">
-                        Log in to access your recipes
-                    </Text>
-                </VStack>
+            <Field.Root invalid={!!errors.password} required>
+                <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
+                    Password
+                </Field.Label>
+                <Input type="password" placeholder="••••••••" {...register('password')} required />
+                {errors.password && <Field.ErrorText>{errors.password.message}</Field.ErrorText>}
+            </Field.Root>
 
-                <Stack gap="element" as="form" onSubmit={handleSubmit(onSubmit)}>
-                    <Field.Root invalid={!!errors.email} required>
-                        <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
-                            Email
-                        </Field.Label>
-                        <Input
-                            type="email"
-                            placeholder="your@email.com"
-                            {...register('email')}
-                            required
-                        />
-                        {errors.email && <Field.ErrorText>{errors.email.message}</Field.ErrorText>}
-                    </Field.Root>
-
-                    <Field.Root invalid={!!errors.password} required>
-                        <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
-                            Password
-                        </Field.Label>
-                        <Input
-                            type="password"
-                            placeholder="••••••••"
-                            {...register('password')}
-                            required
-                        />
-                        {errors.password && (
-                            <Field.ErrorText>{errors.password.message}</Field.ErrorText>
-                        )}
-                    </Field.Root>
-
-                    <Link
-                        href="/auth/forgot-password"
-                        textAlign="right"
-                        color="fills.actionsBrandStrong.default"
-                        fontSize="sm"
-                    >
-                        Forgot password?
-                    </Link>
-
-                    <Button
-                        type="submit"
-                        size="lg"
-                        width="full"
-                        mt="element"
-                        loading={isSubmitting}
-                        disabled={!isDirty || !isValid || isSubmitting}
-                    >
-                        Log In
-                    </Button>
-                </Stack>
-
-                <Text textAlign="center" color="textAndIcons.onSurfaces.helper" fontSize="sm">
-                    Don&apos;t have an account?{' '}
-                    <Link href="/auth?mode=signup" color="fills.actionsBrandStrong.default">
-                        Sign up
-                    </Link>
-                </Text>
-            </VStack>
-        </Container>
+            <Link
+                href="/auth/forgot-password"
+                textAlign="right"
+                color="fills.actionsBrandStrong.default"
+                fontSize="sm"
+            >
+                Forgot password?
+            </Link>
+        </FormCard>
     );
 }

@@ -1,12 +1,12 @@
 'use client';
 
-import { Button, Container, Field, Heading, Input, Stack, Text, VStack } from '@chakra-ui/react';
+import { Field, Input } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
 import { toaster } from '@/components/chakra-ui/toaster';
-import { Link } from '@/components/ui/Link';
+import { FormCard } from '@/components/ui/FormCard';
 import { ForgotPasswordDto, forgotPasswordSchema } from '@/models/user';
 
 import { forgotPasswordAction } from '../actions';
@@ -54,51 +54,26 @@ export function ForgotPassword() {
     };
 
     return (
-        <Container maxW="md">
-            <VStack gap="component" align="stretch" p={8} borderRadius="xl" borderWidth="1px">
-                <VStack gap="element" textAlign="center">
-                    <Heading as="h2" fontSize="4xl" color="textAndIcons.onSurfaces.lead">
-                        Forgot Password?
-                    </Heading>
+        <FormCard
+            title="Forgot Password?"
+            subtitle="Enter your email and we'll send you a reset link"
+            onSubmit={handleSubmit(onSubmit)}
+            submitButtonText="Send Reset Link"
+            isSubmitting={isSubmitting}
+            isDisabled={!isDirty || !isValid || isSubmitting}
+            footerText="Remember your password?"
+            footerLinkText="Log in"
+            footerLinkHref="/auth?mode=login"
+        >
+            <Field.Root invalid={!!errors.email} required>
+                <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
+                    Email
+                </Field.Label>
 
-                    <Text color="textAndIcons.onSurfaces.helper">
-                        Enter your email and we&apos;ll send you a reset link
-                    </Text>
-                </VStack>
+                <Input type="email" placeholder="your@email.com" {...register('email')} required />
 
-                <Stack gap="element" as="form" onSubmit={handleSubmit(onSubmit)}>
-                    <Field.Root invalid={!!errors.email} required>
-                        <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
-                            Email
-                        </Field.Label>
-                        <Input
-                            type="email"
-                            placeholder="your@email.com"
-                            {...register('email')}
-                            required
-                        />
-                        {errors.email && <Field.ErrorText>{errors.email.message}</Field.ErrorText>}
-                    </Field.Root>
-
-                    <Button
-                        type="submit"
-                        size="lg"
-                        width="full"
-                        mt="element"
-                        loading={isSubmitting}
-                        disabled={!isDirty || !isValid || isSubmitting}
-                    >
-                        Send Reset Link
-                    </Button>
-                </Stack>
-
-                <Text textAlign="center" color="textAndIcons.onSurfaces.helper" fontSize="sm">
-                    Remember your password?{' '}
-                    <Link href="/auth?mode=login" color="fills.actionsBrandStrong.default">
-                        Log in
-                    </Link>
-                </Text>
-            </VStack>
-        </Container>
+                {errors.email && <Field.ErrorText>{errors.email.message}</Field.ErrorText>}
+            </Field.Root>
+        </FormCard>
     );
 }

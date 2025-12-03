@@ -82,6 +82,9 @@ export const semanticTokens = {
                 card: {
                     value: { base: '{colors.neutrals.2}', _dark: '{colors.neutrals.90}' },
                 },
+                cardElevated: {
+                    value: { base: '{colors.neutrals.0}', _dark: '{colors.neutrals.80}' },
+                },
                 pressed: {
                     value: { base: '{colors.secondary.2}', _dark: '{colors.neutrals.70}' },
                 },

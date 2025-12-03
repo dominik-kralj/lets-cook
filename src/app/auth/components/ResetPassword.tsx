@@ -1,13 +1,14 @@
 // src/app/auth/components/ResetPassword.tsx
 'use client';
 
-import { Button, Container, Field, Heading, Input, Stack, Text, VStack } from '@chakra-ui/react';
+import { Button, Container, Field, Heading, Input, Text, VStack } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { toaster } from '@/components/chakra-ui/toaster';
+import { FormCard } from '@/components/ui/FormCard';
 import { Link } from '@/components/ui/Link';
 import { ResetPasswordDto, resetPasswordSchema } from '@/models/user';
 
@@ -76,7 +77,16 @@ export function ResetPassword() {
     if (!isValidToken) {
         return (
             <Container maxW="md">
-                <VStack gap="component" align="stretch" p={8} borderRadius="xl" borderWidth="1px">
+                <VStack
+                    gap="component"
+                    align="stretch"
+                    p={8}
+                    borderRadius="xl"
+                    borderWidth="1px"
+                    borderColor="outlines.withControlsNeutral.default"
+                    bg="fills.surfaces.cardElevated"
+                    boxShadow="sm"
+                >
                     <VStack gap="element" textAlign="center">
                         <Heading as="h2" fontSize="4xl" color="textAndIcons.onSurfaces.lead">
                             Invalid Link
@@ -97,67 +107,42 @@ export function ResetPassword() {
     }
 
     return (
-        <Container maxW="md">
-            <VStack gap="component" align="stretch" p={8} borderRadius="xl" borderWidth="1px">
-                <VStack gap="element" textAlign="center">
-                    <Heading as="h2" fontSize="4xl" color="textAndIcons.onSurfaces.lead">
-                        Reset Password
-                    </Heading>
-                    <Text color="textAndIcons.onSurfaces.helper">
-                        Enter your new password below
-                    </Text>
-                </VStack>
+        <FormCard
+            title="Reset Password"
+            subtitle="Enter your new password below"
+            onSubmit={handleSubmit(onSubmit)}
+            submitButtonText="Reset Password"
+            isSubmitting={isSubmitting}
+            isDisabled={!isDirty || !isValid || isSubmitting}
+            footerText="Remember your password?"
+            footerLinkText="Log in"
+            footerLinkHref="/auth?mode=login"
+        >
+            <Field.Root invalid={!!errors.password} required>
+                <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
+                    New Password
+                </Field.Label>
 
-                <Stack gap="element" as="form" onSubmit={handleSubmit(onSubmit)}>
-                    <Field.Root invalid={!!errors.password} required>
-                        <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
-                            New Password
-                        </Field.Label>
-                        <Input
-                            type="password"
-                            placeholder="••••••••"
-                            {...register('password')}
-                            required
-                        />
-                        {errors.password && (
-                            <Field.ErrorText>{errors.password.message}</Field.ErrorText>
-                        )}
-                    </Field.Root>
+                <Input type="password" placeholder="••••••••" {...register('password')} required />
+                {errors.password && <Field.ErrorText>{errors.password.message}</Field.ErrorText>}
+            </Field.Root>
 
-                    <Field.Root invalid={!!errors.confirmPassword} required>
-                        <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
-                            Confirm New Password
-                        </Field.Label>
-                        <Input
-                            type="password"
-                            placeholder="••••••••"
-                            {...register('confirmPassword')}
-                            required
-                        />
-                        {errors.confirmPassword && (
-                            <Field.ErrorText>{errors.confirmPassword.message}</Field.ErrorText>
-                        )}
-                    </Field.Root>
+            <Field.Root invalid={!!errors.confirmPassword} required>
+                <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
+                    Confirm New Password
+                </Field.Label>
 
-                    <Button
-                        type="submit"
-                        size="lg"
-                        width="full"
-                        mt="element"
-                        loading={isSubmitting}
-                        disabled={!isDirty || !isValid || isSubmitting}
-                    >
-                        Reset Password
-                    </Button>
-                </Stack>
+                <Input
+                    type="password"
+                    placeholder="••••••••"
+                    {...register('confirmPassword')}
+                    required
+                />
 
-                <Text textAlign="center" color="textAndIcons.onSurfaces.helper" fontSize="sm">
-                    Remember your password?{' '}
-                    <Link href="/auth?mode=login" color="fills.actionsBrandStrong.default">
-                        Log in
-                    </Link>
-                </Text>
-            </VStack>
-        </Container>
+                {errors.confirmPassword && (
+                    <Field.ErrorText>{errors.confirmPassword.message}</Field.ErrorText>
+                )}
+            </Field.Root>
+        </FormCard>
     );
 }
