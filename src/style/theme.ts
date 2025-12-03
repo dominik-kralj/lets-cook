@@ -3,6 +3,7 @@ import { createSystem, defaultConfig, defineConfig } from '@chakra-ui/react';
 import { colors } from './colors';
 import { buttonRecipe } from './components/buttonRecipe';
 import { cardRecipe } from './components/cardRecipe';
+import { inputRecipe } from './components/inputRecipe';
 import { semanticTokens } from './semanticTokens';
 import { spacing } from './spacing';
 
@@ -13,6 +14,7 @@ const config = defineConfig({
         recipes: {
             button: buttonRecipe,
             card: cardRecipe,
+            input: inputRecipe,
         },
     },
 });
