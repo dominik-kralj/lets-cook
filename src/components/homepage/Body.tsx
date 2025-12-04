@@ -52,7 +52,7 @@ export const Body = () => {
     ];
 
     return (
-        <Container display="flex" flexDir="column" gap="container">
+        <Container display="flex" flexDir="column" gap="container" mb="section">
             <VStack gap="component" textAlign="center">
                 <Heading
                     as="h2"

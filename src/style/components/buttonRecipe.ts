@@ -35,10 +35,9 @@ export const buttonRecipe = defineRecipe({
                 },
             },
             outline: {
-                border: '1px solid',
-                borderColor: 'outlines.withControlsNeutral.default',
-                bg: 'fills.surfaces.background',
+                bg: 'fills.controlsNeutral.inactive',
                 color: 'textAndIcons.onSurfaces.lead',
+                border: '1px solid var(--chakra-colors-neutrals-15) !important',
 
                 _hover: {
                     bg: 'fills.surfaces.card',
