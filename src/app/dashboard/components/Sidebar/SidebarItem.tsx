@@ -13,14 +13,12 @@ interface NavItemProps {
 
 export function SidebarItem({ href, icon: Icon, label, isActive }: NavItemProps) {
     return (
-        <Link href={href} textDecoration="none" display="block" width="full">
+        <Link href={href} textDecoration="none" display="block">
             <Box
                 display="flex"
                 alignItems="center"
-                gap="element"
-                px={4}
-                py={3}
-                mx={-4}
+                gap="tight"
+                p={3}
                 borderRadius="md"
                 bg={isActive ? 'primary.10' : 'transparent'}
                 color={
@@ -30,7 +28,6 @@ export function SidebarItem({ href, icon: Icon, label, isActive }: NavItemProps)
                 _hover={{
                     bg: isActive ? 'primary.15' : 'fills.controlsNeutral.hover',
                 }}
-                cursor="pointer"
                 fontWeight={isActive ? 'semibold' : 'medium'}
             >
                 <Icon size={20} />

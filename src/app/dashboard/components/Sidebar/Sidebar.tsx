@@ -1,7 +1,6 @@
-// src/app/dashboard/components/Sidebar/Sidebar.tsx
 'use client';
 
-import { Box, Heading, Separator, VStack } from '@chakra-ui/react';
+import { Box, Flex, Heading, Separator, VStack } from '@chakra-ui/react';
 import { usePathname } from 'next/navigation';
 import { GiChefToque } from 'react-icons/gi';
 import {
@@ -29,33 +28,35 @@ export function Sidebar() {
             p="component"
         >
             <VStack align="stretch" gap="component" h="full">
-                {/* Logo & Theme Toggle */}
-                <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Flex alignItems="center" justifyContent="space-between">
                     <Link href="/" textDecoration="none">
                         <Box display="flex" alignItems="center" gap="tight" cursor="pointer">
                             <GiChefToque size={28} color="var(--chakra-colors-primary-40)" />
+
                             <Heading as="h1" fontSize="xl" color="textAndIcons.onSurfaces.lead">
                                 Let&apos;s Cook
                             </Heading>
                         </Box>
                     </Link>
-                    <ColorModeButton size="sm" variant="ghost" />
-                </Box>
 
-                {/* Navigation */}
-                <VStack align="stretch" gap="tight" px={4}>
+                    <ColorModeButton size="sm" variant="ghost" />
+                </Flex>
+
+                <VStack align="stretch">
                     <SidebarItem
                         href="/dashboard"
                         icon={RiFileListLine}
                         label="Recipes"
                         isActive={pathname === '/dashboard'}
                     />
+
                     <SidebarItem
                         href="/dashboard/collections"
                         icon={RiFolderLine}
                         label="Collections"
                         isActive={pathname === '/dashboard/collections'}
                     />
+
                     <SidebarItem
                         href="/dashboard/favorites"
                         icon={RiBookmarkLine}
@@ -64,20 +65,18 @@ export function Sidebar() {
                     />
                 </VStack>
 
-                {/* Spacer */}
                 <Box flex="1" />
 
-                {/* Divider */}
                 <Separator borderColor="neutrals.10" />
 
-                {/* Bottom Navigation */}
-                <VStack align="stretch" gap="tight" px={4} pb={0}>
+                <VStack align="stretch" pb={0}>
                     <SidebarItem
                         href="/dashboard/profile"
                         icon={RiUserLine}
                         label="Profile"
                         isActive={pathname === '/dashboard/profile'}
                     />
+
                     <SidebarItem
                         href="/dashboard/settings"
                         icon={RiSettings4Line}
