@@ -11,7 +11,7 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
     return (
-        <Flex minH="100vh" bg="fills.surfaces.background">
+        <Flex height="100%" bg="fills.surfaces.background" flex={1}>
             <Sidebar />
 
             <Box flex="1" bg="fills.controlsNeutral.inactive" p="container">

@@ -4,6 +4,7 @@ import { colors } from './colors';
 import { buttonRecipe } from './components/buttonRecipe';
 import { cardRecipe } from './components/cardRecipe';
 import { inputRecipe } from './components/inputRecipe';
+import { linkRecipe } from './components/linkRecipe';
 import { semanticTokens } from './semanticTokens';
 import { spacing } from './spacing';
 
@@ -15,6 +16,7 @@ const config = defineConfig({
             button: buttonRecipe,
             card: cardRecipe,
             input: inputRecipe,
+            link: linkRecipe,
         },
     },
 });

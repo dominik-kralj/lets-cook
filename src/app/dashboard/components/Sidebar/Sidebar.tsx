@@ -8,7 +8,6 @@ import {
     RiBookmarkLine,
     RiFileListLine,
     RiFolderLine,
-    RiLightbulbLine,
     RiSettings4Line,
     RiUserLine,
 } from 'react-icons/ri';
@@ -64,32 +63,6 @@ export function Sidebar() {
                         isActive={pathname === '/dashboard/favorites'}
                     />
                 </VStack>
-
-                {/* Pro Tip Alert */}
-                <Box
-                    mx={4}
-                    p={3}
-                    bg="primary.5"
-                    borderRadius="md"
-                    borderLeft="3px solid"
-                    borderColor="primary.40"
-                >
-                    <Box display="flex" gap="tight">
-                        <RiLightbulbLine size={18} color="var(--chakra-colors-primary-40)" />
-                        <Box>
-                            <Box fontSize="xs" fontWeight="bold" color="primary.40" mb={1}>
-                                Pro Tip
-                            </Box>
-                            <Box
-                                fontSize="xs"
-                                color="textAndIcons.onSurfaces.helper"
-                                lineHeight="1.4"
-                            >
-                                Use tags to organize recipes by cuisine or meal type.
-                            </Box>
-                        </Box>
-                    </Box>
-                </Box>
 
                 {/* Spacer */}
                 <Box flex="1" />
