@@ -1,15 +1,16 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
-import { updateSession } from './lib/supabase/middleware';
+import { updateSession } from '@/lib/supabase/proxy';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     const { response, user } = await updateSession(request);
 
     if (request.nextUrl.pathname.startsWith('/dashboard') && !user) {
         return NextResponse.redirect(new URL('/auth?mode=login', request.url));
     }
 
-    if (request.nextUrl.pathname.startsWith('/auth') && user) {
+    const isLoginPage = request.nextUrl.searchParams.get('mode') === 'login';
+    if (request.nextUrl.pathname.startsWith('/auth') && user && isLoginPage) {
         return NextResponse.redirect(new URL('/dashboard', request.url));
     }
 

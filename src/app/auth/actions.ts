@@ -144,3 +144,18 @@ export async function resetPasswordAction(newPassword: string) {
 
     return { success: true };
 }
+
+export async function resendConfirmationEmailAction(email: string) {
+    const supabase = await createClient();
+
+    const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+    });
+
+    if (error) {
+        return { error: error.message };
+    }
+
+    return { success: true };
+}
