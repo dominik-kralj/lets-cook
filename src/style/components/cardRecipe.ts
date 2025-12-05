@@ -1,37 +1,34 @@
-import { defineRecipe } from '@chakra-ui/react';
+import { defineSlotRecipe } from '@chakra-ui/react';
+import { cardAnatomy } from '@chakra-ui/react/anatomy';
 
-export const cardRecipe = defineRecipe({
+export const cardRecipe = defineSlotRecipe({
+    slots: cardAnatomy.keys(),
     base: {
-        borderRadius: 'lg',
-        transition: 'all 0.2s',
-        overflow: 'hidden',
+        root: {
+            bg: 'fills.surfaces.cardElevated',
+            borderRadius: '2xl',
+            borderWidth: '1px',
+            borderColor: 'neutrals.10',
+        },
+        body: {
+            p: 6,
+        },
     },
-
     variants: {
         variant: {
             elevated: {
-                bg: 'fills.surfaces.card',
-                boxShadow: 'sm',
-                _hover: {
-                    boxShadow: 'md',
-                    transform: 'translateY(-2px)',
+                root: {
+                    boxShadow: 'sm',
                 },
             },
             outline: {
-                bg: 'fills.surfaces.card',
-                borderWidth: '1px',
-                borderColor: 'outlines.withControlsNeutral.default',
-                _hover: {
-                    borderColor: 'outlines.withControlsNeutral.hover',
+                root: {
+                    boxShadow: 'none',
                 },
-            },
-            filled: {
-                bg: 'fills.surfaces.card',
             },
         },
     },
-
     defaultVariants: {
-        variant: 'elevated',
+        variant: 'outline',
     },
 });

@@ -1,90 +1,58 @@
-'use client';
+import { Box, Drawer, IconButton } from '@chakra-ui/react';
+import { useState } from 'react';
+import { RiMenuLine } from 'react-icons/ri';
 
-import { Box, Flex, Heading, Separator, VStack } from '@chakra-ui/react';
-import { usePathname } from 'next/navigation';
-import { GiChefToque } from 'react-icons/gi';
-import {
-    RiBookmarkLine,
-    RiFileListLine,
-    RiFolderLine,
-    RiSettings4Line,
-    RiUserLine,
-} from 'react-icons/ri';
-
-import { ColorModeButton } from '@/components/chakra-ui/color-mode';
-import { Link } from '@/components/ui/Link';
-
-import { SidebarItem } from './SidebarItem';
+import { SidebarContent } from './SidebarContent';
 
 export function Sidebar() {
-    const pathname = usePathname();
+    const [open, setOpen] = useState(false);
 
     return (
-        <Box
-            w="280px"
-            bg="fills.surfaces.cardElevated"
-            borderRight="1px solid"
-            borderColor="neutrals.10"
-            p="component"
-        >
-            <VStack align="stretch" gap="component" h="full">
-                <Flex alignItems="center" justifyContent="space-between">
-                    <Link href="/" textDecoration="none">
-                        <Box display="flex" alignItems="center" gap="tight" cursor="pointer">
-                            <GiChefToque size={28} color="var(--chakra-colors-primary-40)" />
+        <>
+            <Box
+                display={{ base: 'block', lg: 'none' }}
+                position="fixed"
+                top={4}
+                left={4}
+                zIndex={20}
+            >
+                <IconButton
+                    aria-label="Open menu"
+                    onClick={() => setOpen(true)}
+                    bg="fills.surfaces.cardElevated"
+                    borderWidth="1px"
+                    borderColor="neutrals.10"
+                    size="lg"
+                    color="textAndIcons.onSurfaces.lead"
+                >
+                    <RiMenuLine size={24} />
+                </IconButton>
+            </Box>
 
-                            <Heading as="h1" fontSize="xl" color="textAndIcons.onSurfaces.lead">
-                                Let&apos;s Cook
-                            </Heading>
-                        </Box>
-                    </Link>
+            <Box
+                display={{ base: 'none', lg: 'block' }}
+                w="280px"
+                bg="fills.surfaces.cardElevated"
+                borderRight="1px solid"
+                borderColor="neutrals.10"
+                p="component"
+            >
+                <SidebarContent />
+            </Box>
 
-                    <ColorModeButton size="sm" variant="ghost" />
-                </Flex>
-
-                <VStack align="stretch">
-                    <SidebarItem
-                        href="/dashboard"
-                        icon={RiFileListLine}
-                        label="Recipes"
-                        isActive={pathname === '/dashboard'}
-                    />
-
-                    <SidebarItem
-                        href="/dashboard/collections"
-                        icon={RiFolderLine}
-                        label="Collections"
-                        isActive={pathname === '/dashboard/collections'}
-                    />
-
-                    <SidebarItem
-                        href="/dashboard/favorites"
-                        icon={RiBookmarkLine}
-                        label="Favorites"
-                        isActive={pathname === '/dashboard/favorites'}
-                    />
-                </VStack>
-
-                <Box flex="1" />
-
-                <Separator borderColor="neutrals.10" />
-
-                <VStack align="stretch" pb={0}>
-                    <SidebarItem
-                        href="/dashboard/profile"
-                        icon={RiUserLine}
-                        label="Profile"
-                        isActive={pathname === '/dashboard/profile'}
-                    />
-
-                    <SidebarItem
-                        href="/dashboard/settings"
-                        icon={RiSettings4Line}
-                        label="Settings"
-                        isActive={pathname === '/dashboard/settings'}
-                    />
-                </VStack>
-            </VStack>
-        </Box>
+            <Drawer.Root
+                open={open}
+                onOpenChange={(e) => setOpen(e.open)}
+                placement="start"
+                size="sm"
+            >
+                <Drawer.Backdrop />
+                <Drawer.Positioner>
+                    <Drawer.Content bg="fills.surfaces.cardElevated" p="component">
+                        <SidebarContent onClose={() => setOpen(false)} />
+                    </Drawer.Content>
+                </Drawer.Positioner>
+            </Drawer.Root>
+        </>
     );
 }

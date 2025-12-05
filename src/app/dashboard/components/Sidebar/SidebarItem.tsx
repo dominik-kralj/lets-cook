@@ -9,11 +9,12 @@ interface NavItemProps {
     icon: React.ElementType;
     label: string;
     isActive?: boolean;
+    onClick?: () => void;
 }
 
-export function SidebarItem({ href, icon: Icon, label, isActive }: NavItemProps) {
+export function SidebarItem({ href, icon: Icon, label, isActive, onClick }: NavItemProps) {
     return (
-        <Link href={href} textDecoration="none" display="block">
+        <Link href={href} textDecoration="none" display="block" onClick={onClick}>
             <Box
                 display="flex"
                 alignItems="center"
