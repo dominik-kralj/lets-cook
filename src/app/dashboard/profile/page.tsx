@@ -5,12 +5,13 @@ import { RiBookmarkFill, RiFileListFill, RiFolderFill, RiUserLine } from 'react-
 
 import { logoutAction } from '@/app/auth/actions';
 import { useProfile } from '@/hooks/useProfile';
+import { formatDate } from '@/utils/helper';
 
 import { DashboardLayout } from '../components/DashsboardLayout';
 import { EditProfileDialog } from './components/EditProfileDialog';
 
 export default function ProfilePage() {
-    const { profile, isLoading, isError } = useProfile();
+    const { profile, isLoading, isError, mutate } = useProfile();
 
     if (isLoading) {
         return (
@@ -50,11 +51,6 @@ export default function ProfilePage() {
         },
     ];
 
-    const memberSince = new Date(profile.createdAt).toLocaleDateString('en-US', {
-        month: 'short',
-        year: 'numeric',
-    });
-
     return (
         <DashboardLayout>
             <VStack align="stretch" gap="component">
@@ -67,12 +63,12 @@ export default function ProfilePage() {
                     >
                         Profile
                     </Heading>
+
                     <Text color="textAndIcons.onSurfaces.helper">
                         Manage your account information
                     </Text>
                 </Box>
 
-                {/* Profile Card */}
                 <Card.Root>
                     <Card.Body>
                         <VStack gap="component" align="stretch">
@@ -96,6 +92,7 @@ export default function ProfilePage() {
                                             <RiUserLine />
                                         </Icon>
                                     </Box>
+
                                     <VStack align="start" gap="tight">
                                         <Heading
                                             as="h2"
@@ -104,12 +101,14 @@ export default function ProfilePage() {
                                         >
                                             {profile.username}
                                         </Heading>
+
                                         <Text
                                             color="textAndIcons.onSurfaces.helper"
                                             fontSize={{ base: 'sm', md: 'md' }}
                                         >
                                             {profile.email}
                                         </Text>
+
                                         {profile.bio && (
                                             <Text
                                                 fontSize="sm"
@@ -119,22 +118,23 @@ export default function ProfilePage() {
                                                 {profile.bio}
                                             </Text>
                                         )}
+
                                         <Text
                                             fontSize="sm"
                                             color="textAndIcons.onSurfaces.helper"
                                             fontWeight="medium"
                                         >
-                                            Member since {memberSince}
+                                            {`Member since ${formatDate(profile.createdAt)}`}
                                         </Text>
                                     </VStack>
                                 </HStack>
-                                <EditProfileDialog profile={profile} />
+
+                                <EditProfileDialog profile={profile} onUpdate={mutate} />
                             </HStack>
                         </VStack>
                     </Card.Body>
                 </Card.Root>
 
-                {/* Statistics Cards */}
                 <Grid templateColumns={{ base: '1fr', sm: 'repeat(3, 1fr)' }} gap="component">
                     {statistics.map((stat) => (
                         <Card.Root key={stat.label}>
@@ -147,7 +147,7 @@ export default function ProfilePage() {
                                         color="textAndIcons.onControlsBrand.default"
                                         flexShrink={0}
                                     >
-                                        <Icon size={{ base: 'lg', md: 'xl' }}>
+                                        <Icon size="lg">
                                             <stat.icon />
                                         </Icon>
                                     </Box>

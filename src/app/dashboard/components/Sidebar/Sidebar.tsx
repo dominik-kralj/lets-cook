@@ -13,7 +13,7 @@ export function Sidebar() {
                 display={{ base: 'block', lg: 'none' }}
                 position="fixed"
                 top={4}
-                left={4}
+                right={4}
                 zIndex={20}
             >
                 <IconButton

@@ -6,7 +6,6 @@ import {
     RiCloseLine,
     RiFileListLine,
     RiFolderLine,
-    RiLightbulbLine,
     RiSettings4Line,
     RiUserLine,
 } from 'react-icons/ri';
@@ -25,18 +24,20 @@ export function SidebarContent({ onClose }: SidebarContentProps) {
 
     return (
         <VStack align="stretch" gap="component" h="full">
-            {/* Logo & Theme Toggle */}
             <Box display="flex" alignItems="center" justifyContent="space-between">
                 <Link href="/" textDecoration="none">
                     <Box display="flex" alignItems="center" gap="tight" cursor="pointer">
                         <GiChefToque size={28} color="var(--chakra-colors-primary-40)" />
+
                         <Heading as="h1" fontSize="xl" color="textAndIcons.onSurfaces.lead">
                             Let&apos;s Cook
                         </Heading>
                     </Box>
                 </Link>
+
                 <Box display="flex" gap="tight">
                     <ColorModeButton size="sm" variant="ghost" />
+
                     {onClose && (
                         <IconButton
                             size="sm"
@@ -51,8 +52,7 @@ export function SidebarContent({ onClose }: SidebarContentProps) {
                 </Box>
             </Box>
 
-            {/* Navigation */}
-            <VStack align="stretch" gap="tight" px={4}>
+            <VStack align="stretch">
                 <SidebarItem
                     href="/dashboard"
                     icon={RiFileListLine}
@@ -76,36 +76,11 @@ export function SidebarContent({ onClose }: SidebarContentProps) {
                 />
             </VStack>
 
-            {/* Pro Tip Alert */}
-            <Box
-                mx={4}
-                p={3}
-                bg="primary.5"
-                borderRadius="md"
-                borderLeft="3px solid"
-                borderColor="primary.40"
-            >
-                <Box display="flex" gap="tight">
-                    <RiLightbulbLine size={18} color="var(--chakra-colors-primary-40)" />
-                    <Box>
-                        <Box fontSize="xs" fontWeight="bold" color="primary.40" mb={1}>
-                            Pro Tip
-                        </Box>
-                        <Box fontSize="xs" color="textAndIcons.onSurfaces.helper" lineHeight="1.4">
-                            Use tags to organize recipes by cuisine or meal type.
-                        </Box>
-                    </Box>
-                </Box>
-            </Box>
-
-            {/* Spacer */}
             <Box flex="1" />
 
-            {/* Divider */}
             <Separator borderColor="neutrals.10" />
 
-            {/* Bottom Navigation */}
-            <VStack align="stretch" gap="tight" px={4} pb={0}>
+            <VStack align="stretch">
                 <SidebarItem
                     href="/dashboard/profile"
                     icon={RiUserLine}

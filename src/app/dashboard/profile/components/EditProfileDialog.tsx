@@ -16,9 +16,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiUserLine } from 'react-icons/ri';
+import { KeyedMutator } from 'swr';
 
 import { toaster } from '@/components/chakra-ui/toaster';
-import { useProfile } from '@/hooks/useProfile';
 import { UpdateProfileFormData, updateProfileSchema } from '@/models/user';
 import { UserProfile } from '@/types/user';
 
@@ -26,16 +26,16 @@ import { updateProfileAction } from '../actions';
 
 interface EditProfileDialogProps {
     profile: UserProfile;
+    onUpdate: KeyedMutator<UserProfile>;
 }
 
-export function EditProfileDialog({ profile }: EditProfileDialogProps) {
-    const { mutate } = useProfile();
+export function EditProfileDialog({ profile, onUpdate }: EditProfileDialogProps) {
     const [open, setOpen] = useState(false);
 
     const {
         register,
         handleSubmit,
-        formState: { errors, isSubmitting, isDirty },
+        formState: { errors, isSubmitting, isDirty, dirtyFields },
         reset,
     } = useForm<UpdateProfileFormData>({
         resolver: zodResolver(updateProfileSchema),
@@ -54,6 +54,17 @@ export function EditProfileDialog({ profile }: EditProfileDialogProps) {
 
     const onSubmit = async (data: UpdateProfileFormData) => {
         try {
+            const changedData: Partial<UpdateProfileFormData> = {};
+
+            if (dirtyFields.username) changedData.username = data.username;
+            if (dirtyFields.email) changedData.email = data.email;
+            if (dirtyFields.bio) changedData.bio = data.bio;
+
+            if (Object.keys(changedData).length === 0) {
+                setOpen(false);
+                return;
+            }
+
             const response = await updateProfileAction(data);
 
             if (response?.error) {
@@ -71,10 +82,11 @@ export function EditProfileDialog({ profile }: EditProfileDialogProps) {
                 type: 'success',
             });
 
-            await mutate();
+            await onUpdate();
             setOpen(false);
         } catch (error) {
             console.error('Error updating profile:', error);
+
             toaster.create({
                 title: 'Something went wrong',
                 description: 'Please try again later.',

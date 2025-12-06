@@ -4,7 +4,6 @@ import type { Metadata } from 'next';
 import { inter } from '@/assets/font';
 import { Provider } from '@/components/chakra-ui/provider';
 import { Toaster } from '@/components/chakra-ui/toaster';
-import { Footer } from '@/components/homepage/Footer';
 
 export const metadata: Metadata = {
     title: "Let's Cook!",
@@ -21,7 +20,6 @@ export default function RootLayout({
                 <Provider>
                     <Flex direction="column" bg="fills.surfaces.background" minH="100vh">
                         {children}
-                        <Footer />
                     </Flex>
                     <Toaster />
                 </Provider>

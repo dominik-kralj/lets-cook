@@ -1,6 +1,7 @@
 import { Container } from '@chakra-ui/react';
 
 import { Body } from '@/components/homepage/Body';
+import { Footer } from '@/components/homepage/Footer';
 import { Header } from '@/components/homepage/Header';
 
 export default function Home() {
@@ -9,6 +10,8 @@ export default function Home() {
             <Header />
 
             <Body />
+
+            <Footer />
         </Container>
     );
 }
