@@ -17,23 +17,13 @@ export async function updateProfileAction(data: Partial<UpdateProfileFormData>) 
             return { error: 'Unauthorized' };
         }
 
-        if (data.email && data.email !== user.email) {
-            const { error: emailError } = await supabase.auth.updateUser({
-                email: data.email,
-            });
-
-            if (emailError) {
-                return { error: emailError.message };
-            }
-        }
-
-        const { username, email, bio, avatar } = data;
+        const { username, bio, avatar } = data;
 
         await db.user.update({
             where: { id: user.id },
             data: {
                 username,
-                email,
+
                 bio,
                 avatar,
             },
