@@ -131,7 +131,9 @@ export default function ProfilePage() {
                                     </VStack>
                                 </HStack>
 
-                                <EditProfileDialog profile={profile} onUpdate={mutate} />
+                                <Box alignSelf="flex-start">
+                                    <EditProfileDialog profile={profile} onUpdate={mutate} />
+                                </Box>
                             </HStack>
                         </VStack>
                     </Card.Body>

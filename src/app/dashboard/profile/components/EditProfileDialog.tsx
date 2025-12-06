@@ -9,15 +9,17 @@ import {
     Field,
     FileUpload,
     Float,
+    IconButton,
     Input,
     Portal,
     Textarea,
     VStack,
 } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { LuX } from 'react-icons/lu';
+import { RiEditLine } from 'react-icons/ri';
 import { KeyedMutator } from 'swr';
 
 import { toaster } from '@/components/chakra-ui/toaster';
@@ -36,7 +38,6 @@ interface EditProfileDialogProps {
 export function EditProfileDialog({ profile, onUpdate }: EditProfileDialogProps) {
     const [open, setOpen] = useState(false);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
-    const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
     const {
         register,
@@ -53,17 +54,6 @@ export function EditProfileDialog({ profile, onUpdate }: EditProfileDialogProps)
         control,
         name: 'avatar',
     });
-
-    useEffect(() => {
-        if (open) {
-            reset({
-                username: profile.username,
-                email: profile.email,
-                bio: profile.bio || '',
-                avatar: profile.avatar || '',
-            });
-        }
-    }, [open, profile.username, profile.email, profile.bio, profile.avatar, reset]);
 
     const handleFileChange = (details: { acceptedFiles: File[] }) => {
         const file = details.acceptedFiles[0];
@@ -92,7 +82,6 @@ export function EditProfileDialog({ profile, onUpdate }: EditProfileDialogProps)
             const changedData: Partial<UpdateProfileFormData> = {};
 
             if (avatarFile) {
-                setIsUploadingAvatar(true);
                 const uploadedUrl = await uploadAvatar(avatarFile, profile.id);
 
                 if (!uploadedUrl) {
@@ -101,16 +90,14 @@ export function EditProfileDialog({ profile, onUpdate }: EditProfileDialogProps)
                         description: 'Please try again',
                         type: 'error',
                     });
-                    setIsUploadingAvatar(false);
+
                     return;
                 }
 
                 changedData.avatar = uploadedUrl;
-                setIsUploadingAvatar(false);
             }
 
             if (dirtyFields.username) changedData.username = data.username;
-            if (dirtyFields.email) changedData.email = data.email;
             if (dirtyFields.bio) changedData.bio = data.bio;
 
             if (Object.keys(changedData).length === 0) {
@@ -152,7 +139,14 @@ export function EditProfileDialog({ profile, onUpdate }: EditProfileDialogProps)
     const handleOpenChange = (details: { open: boolean }) => {
         setOpen(details.open);
 
-        if (!details.open) {
+        if (details.open) {
+            reset({
+                username: profile.username,
+                bio: profile.bio || '',
+                avatar: profile.avatar || '',
+            });
+            setAvatarFile(null);
+        } else {
             setAvatarFile(null);
         }
     };
@@ -166,7 +160,9 @@ export function EditProfileDialog({ profile, onUpdate }: EditProfileDialogProps)
     return (
         <Dialog.Root open={open} onOpenChange={handleOpenChange} placement="center">
             <Dialog.Trigger asChild>
-                <Button width={{ base: 'full', md: 'auto' }}>Edit Profile</Button>
+                <IconButton aria-label="Edit profile" size={{ base: 'md', md: 'lg' }}>
+                    <RiEditLine />
+                </IconButton>
             </Dialog.Trigger>
 
             <Portal>
@@ -244,25 +240,6 @@ export function EditProfileDialog({ profile, onUpdate }: EditProfileDialogProps)
                                         )}
                                     </Field.Root>
 
-                                    <Field.Root required invalid={!!errors.email}>
-                                        <Field.Label
-                                            color="textAndIcons.onSurfaces.lead"
-                                            fontWeight="medium"
-                                        >
-                                            Email Address
-                                        </Field.Label>
-                                        <Input
-                                            type="email"
-                                            {...register('email')}
-                                            placeholder="your@email.com"
-                                        />
-                                        {errors.email && (
-                                            <Field.ErrorText>
-                                                {errors.email.message}
-                                            </Field.ErrorText>
-                                        )}
-                                    </Field.Root>
-
                                     <Field.Root invalid={!!errors.bio}>
                                         <Field.Label
                                             color="textAndIcons.onSurfaces.lead"
@@ -289,7 +266,7 @@ export function EditProfileDialog({ profile, onUpdate }: EditProfileDialogProps)
 
                                 <Button
                                     type="submit"
-                                    loading={isSubmitting || isUploadingAvatar}
+                                    loading={isSubmitting}
                                     disabled={!hasChanges || !isValid}
                                 >
                                     Save Changes
