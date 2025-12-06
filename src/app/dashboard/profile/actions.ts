@@ -23,7 +23,6 @@ export async function updateProfileAction(data: Partial<UpdateProfileFormData>) 
             where: { id: user.id },
             data: {
                 username,
-
                 bio,
                 avatar,
             },
