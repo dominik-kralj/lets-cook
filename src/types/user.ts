@@ -4,6 +4,7 @@ export interface UserProfile {
     username: string;
     createdAt: string;
     bio?: string;
+    avatar?: string;
     statistics: {
         recipes: number;
         collections: number;

@@ -1,12 +1,14 @@
 'use client';
 
 import {
+    Avatar,
     Box,
     Button,
     CloseButton,
     Dialog,
     Field,
-    Icon,
+    FileUpload,
+    Float,
     Input,
     Portal,
     Textarea,
@@ -14,13 +16,15 @@ import {
 } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { RiUserLine } from 'react-icons/ri';
+import { useForm, useWatch } from 'react-hook-form';
+import { LuX } from 'react-icons/lu';
 import { KeyedMutator } from 'swr';
 
 import { toaster } from '@/components/chakra-ui/toaster';
+import { uploadAvatar } from '@/lib/supabase/utils';
 import { UpdateProfileFormData, updateProfileSchema } from '@/models/user';
 import { UserProfile } from '@/types/user';
+import { validateImageFile } from '@/utils/helper';
 
 import { updateProfileAction } from '../actions';
 
@@ -31,15 +35,23 @@ interface EditProfileDialogProps {
 
 export function EditProfileDialog({ profile, onUpdate }: EditProfileDialogProps) {
     const [open, setOpen] = useState(false);
+    const [avatarFile, setAvatarFile] = useState<File | null>(null);
+    const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
     const {
         register,
         handleSubmit,
-        formState: { errors, isSubmitting, isDirty, dirtyFields },
+        formState: { errors, isSubmitting, isDirty, dirtyFields, isValid },
         reset,
+        control,
     } = useForm<UpdateProfileFormData>({
         resolver: zodResolver(updateProfileSchema),
         mode: 'onChange',
+    });
+
+    const avatarValue = useWatch({
+        control,
+        name: 'avatar',
     });
 
     useEffect(() => {
@@ -48,13 +60,54 @@ export function EditProfileDialog({ profile, onUpdate }: EditProfileDialogProps)
                 username: profile.username,
                 email: profile.email,
                 bio: profile.bio || '',
+                avatar: profile.avatar || '',
             });
         }
-    }, [open, profile.username, profile.email, profile.bio, reset]);
+    }, [open, profile.username, profile.email, profile.bio, profile.avatar, reset]);
+
+    const handleFileChange = (details: { acceptedFiles: File[] }) => {
+        const file = details.acceptedFiles[0];
+        if (!file) return;
+
+        const validation = validateImageFile(file);
+
+        if (!validation.valid) {
+            toaster.create({
+                title: 'Invalid file',
+                description: validation.error,
+                type: 'error',
+            });
+            return;
+        }
+
+        setAvatarFile(file);
+    };
+
+    const handleRemoveAvatar = () => {
+        setAvatarFile(null);
+    };
 
     const onSubmit = async (data: UpdateProfileFormData) => {
         try {
             const changedData: Partial<UpdateProfileFormData> = {};
+
+            if (avatarFile) {
+                setIsUploadingAvatar(true);
+                const uploadedUrl = await uploadAvatar(avatarFile, profile.id);
+
+                if (!uploadedUrl) {
+                    toaster.create({
+                        title: 'Failed to upload avatar',
+                        description: 'Please try again',
+                        type: 'error',
+                    });
+                    setIsUploadingAvatar(false);
+                    return;
+                }
+
+                changedData.avatar = uploadedUrl;
+                setIsUploadingAvatar(false);
+            }
 
             if (dirtyFields.username) changedData.username = data.username;
             if (dirtyFields.email) changedData.email = data.email;
@@ -65,7 +118,7 @@ export function EditProfileDialog({ profile, onUpdate }: EditProfileDialogProps)
                 return;
             }
 
-            const response = await updateProfileAction(data);
+            const response = await updateProfileAction(changedData);
 
             if (response?.error) {
                 toaster.create({
@@ -84,6 +137,7 @@ export function EditProfileDialog({ profile, onUpdate }: EditProfileDialogProps)
 
             await onUpdate();
             setOpen(false);
+            setAvatarFile(null);
         } catch (error) {
             console.error('Error updating profile:', error);
 
@@ -97,7 +151,17 @@ export function EditProfileDialog({ profile, onUpdate }: EditProfileDialogProps)
 
     const handleOpenChange = (details: { open: boolean }) => {
         setOpen(details.open);
+
+        if (!details.open) {
+            setAvatarFile(null);
+        }
     };
+
+    const avatarPreview = avatarFile
+        ? URL.createObjectURL(avatarFile)
+        : avatarValue || profile.avatar;
+
+    const hasChanges = isDirty || avatarFile !== null;
 
     return (
         <Dialog.Root open={open} onOpenChange={handleOpenChange} placement="center">
@@ -107,6 +171,7 @@ export function EditProfileDialog({ profile, onUpdate }: EditProfileDialogProps)
 
             <Portal>
                 <Dialog.Backdrop />
+
                 <Dialog.Positioner px={{ base: 'element', md: 0 }}>
                     <Dialog.Content>
                         <Dialog.CloseTrigger asChild position="absolute" top="2" right="2">
@@ -121,25 +186,44 @@ export function EditProfileDialog({ profile, onUpdate }: EditProfileDialogProps)
                             <Dialog.Body>
                                 <VStack gap="component" align="stretch">
                                     <VStack gap="tight">
-                                        <Box
-                                            w="80px"
-                                            h="80px"
-                                            borderRadius="full"
-                                            bg="fills.controlsNeutral.inactive"
-                                            display="flex"
-                                            alignItems="center"
-                                            justifyContent="center"
-                                            cursor="pointer"
-                                            _hover={{ opacity: 0.8 }}
-                                            transition="opacity 0.2s"
-                                        >
-                                            <Icon size="2xl" color="primary.40">
-                                                <RiUserLine />
-                                            </Icon>
+                                        <Box position="relative">
+                                            <Avatar.Root size="2xl">
+                                                <Avatar.Fallback name={profile.username} />
+
+                                                {avatarPreview && (
+                                                    <Avatar.Image src={avatarPreview} />
+                                                )}
+                                            </Avatar.Root>
+
+                                            {avatarFile && (
+                                                <Float placement="top-end" offset="2">
+                                                    <Button
+                                                        size="xs"
+                                                        colorPalette="red"
+                                                        onClick={handleRemoveAvatar}
+                                                        borderRadius="full"
+                                                        p={0}
+                                                    >
+                                                        <LuX />
+                                                    </Button>
+                                                </Float>
+                                            )}
                                         </Box>
-                                        <Button variant="ghost" size="sm" disabled>
-                                            Click to change avatar
-                                        </Button>
+
+                                        <FileUpload.Root
+                                            accept="image/*"
+                                            maxFiles={1}
+                                            onFileChange={handleFileChange}
+                                            alignItems="center"
+                                        >
+                                            <FileUpload.HiddenInput />
+
+                                            <FileUpload.Trigger asChild>
+                                                <Button variant="ghost" size="sm" type="button">
+                                                    Click to change avatar
+                                                </Button>
+                                            </FileUpload.Trigger>
+                                        </FileUpload.Root>
                                     </VStack>
 
                                     <Field.Root required invalid={!!errors.username}>
@@ -203,7 +287,11 @@ export function EditProfileDialog({ profile, onUpdate }: EditProfileDialogProps)
                                     <Button variant="outline">Cancel</Button>
                                 </Dialog.ActionTrigger>
 
-                                <Button type="submit" loading={isSubmitting} disabled={!isDirty}>
+                                <Button
+                                    type="submit"
+                                    loading={isSubmitting || isUploadingAvatar}
+                                    disabled={!hasChanges || !isValid}
+                                >
                                     Save Changes
                                 </Button>
                             </Dialog.Footer>

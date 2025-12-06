@@ -4,12 +4,9 @@ import { revalidatePath } from 'next/cache';
 
 import db from '@/lib/prisma/db';
 import { createClient } from '@/lib/supabase/server';
+import { UpdateProfileFormData } from '@/models/user';
 
-export async function updateProfileAction(data: {
-    username?: string;
-    email?: string;
-    bio?: string;
-}) {
+export async function updateProfileAction(data: Partial<UpdateProfileFormData>) {
     try {
         const supabase = await createClient();
         const {
@@ -30,12 +27,15 @@ export async function updateProfileAction(data: {
             }
         }
 
+        const { username, email, bio, avatar } = data;
+
         await db.user.update({
             where: { id: user.id },
             data: {
-                username: data.username,
-                email: data.email,
-                bio: data.bio,
+                username,
+                email,
+                bio,
+                avatar,
             },
         });
 

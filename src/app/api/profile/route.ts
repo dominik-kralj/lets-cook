@@ -21,6 +21,7 @@ export async function GET() {
                 username: true,
                 createdAt: true,
                 bio: true,
+                avatar: true,
                 _count: {
                     select: {
                         recipes: true,
@@ -35,7 +36,7 @@ export async function GET() {
             return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
         }
 
-        const { id, email, username, createdAt, _count, bio } = profile;
+        const { id, email, username, createdAt, _count, bio, avatar } = profile;
 
         return NextResponse.json({
             id,
@@ -43,6 +44,7 @@ export async function GET() {
             username,
             createdAt,
             bio,
+            avatar,
             statistics: {
                 recipes: _count.recipes,
                 collections: _count.collections,

@@ -1,7 +1,18 @@
 'use client';
 
-import { Box, Card, Grid, Heading, HStack, Icon, Spinner, Text, VStack } from '@chakra-ui/react';
-import { RiBookmarkFill, RiFileListFill, RiFolderFill, RiUserLine } from 'react-icons/ri';
+import {
+    Avatar,
+    Box,
+    Card,
+    Grid,
+    Heading,
+    HStack,
+    Icon,
+    Spinner,
+    Text,
+    VStack,
+} from '@chakra-ui/react';
+import { RiBookmarkFill, RiFileListFill, RiFolderFill } from 'react-icons/ri';
 
 import { logoutAction } from '@/app/auth/actions';
 import { useProfile } from '@/hooks/useProfile';
@@ -79,19 +90,10 @@ export default function ProfilePage() {
                                 gap="component"
                             >
                                 <HStack gap="component" align="start">
-                                    <Box
-                                        w={{ base: '64px', md: '80px' }}
-                                        h={{ base: '64px', md: '80px' }}
-                                        borderRadius="full"
-                                        bg="fills.controlsNeutral.inactive"
-                                        display="flex"
-                                        alignItems="center"
-                                        justifyContent="center"
-                                    >
-                                        <Icon size={{ base: 'xl', md: '2xl' }} color="primary.40">
-                                            <RiUserLine />
-                                        </Icon>
-                                    </Box>
+                                    <Avatar.Root size={{ base: 'lg', md: 'xl' }}>
+                                        <Avatar.Fallback name={profile.username} />
+                                        {profile.avatar && <Avatar.Image src={profile.avatar} />}
+                                    </Avatar.Root>
 
                                     <VStack align="start" gap="tight">
                                         <Heading
