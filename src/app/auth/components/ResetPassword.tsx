@@ -1,4 +1,3 @@
-// src/app/auth/components/ResetPassword.tsx
 'use client';
 
 import { Button, Container, Field, Heading, Input, Text, VStack } from '@chakra-ui/react';
@@ -10,7 +9,7 @@ import { useForm } from 'react-hook-form';
 import { toaster } from '@/components/chakra-ui/toaster';
 import { FormCard } from '@/components/ui/FormCard';
 import { Link } from '@/components/ui/Link';
-import { ResetPasswordDto, resetPasswordSchema } from '@/models/user';
+import { ResetPasswordFormData, resetPasswordSchema } from '@/models/user';
 
 import { resetPasswordAction } from '../actions';
 
@@ -37,12 +36,12 @@ export function ResetPassword() {
         register,
         handleSubmit,
         formState: { errors, isSubmitting, isValid, isDirty },
-    } = useForm<ResetPasswordDto>({
+    } = useForm<ResetPasswordFormData>({
         resolver: zodResolver(resetPasswordSchema),
         mode: 'onBlur',
     });
 
-    const onSubmit = async (data: ResetPasswordDto) => {
+    const onSubmit = async (data: ResetPasswordFormData) => {
         if (!code) return;
 
         try {

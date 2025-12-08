@@ -3,9 +3,9 @@
 import { AUTH_ERRORS } from '@/lib/errors';
 import prisma from '@/lib/prisma/db';
 import { createClient } from '@/lib/supabase/server';
-import { type LoginDto, loginSchema, type SignupDto, signupSchema } from '@/models/user';
+import { LoginFormData, loginSchema, SignupFormData, signupSchema } from '@/models/user';
 
-export async function signupAction(data: SignupDto) {
+export async function signupAction(data: SignupFormData) {
     const result = signupSchema.safeParse(data);
 
     if (!result.success) {
@@ -16,7 +16,6 @@ export async function signupAction(data: SignupDto) {
 
     const { username, email, password } = result.data;
 
-    // Check for existing user
     const existingUser = await prisma.user.findFirst({
         where: {
             OR: [{ username }, { email }],
@@ -72,7 +71,7 @@ export async function signupAction(data: SignupDto) {
     return { success: true };
 }
 
-export async function loginAction(data: LoginDto) {
+export async function loginAction(data: LoginFormData) {
     const result = loginSchema.safeParse(data);
 
     if (!result.success) {

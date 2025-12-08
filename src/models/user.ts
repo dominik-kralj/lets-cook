@@ -48,8 +48,30 @@ export const updateProfileSchema = z.object({
     avatar: z.url('Invalid avatar URL').optional().or(z.literal('')),
 });
 
-export type LoginDto = z.infer<typeof loginSchema>;
-export type SignupDto = z.infer<typeof signupSchema>;
-export type ForgotPasswordDto = z.infer<typeof forgotPasswordSchema>;
-export type ResetPasswordDto = z.infer<typeof resetPasswordSchema>;
+export const changeEmailSchema = z.object({
+    currentEmail: z.email('Please enter a valid email address'),
+    newEmail: z.email('Please enter a valid email address'),
+});
+
+export const changePasswordSchema = z
+    .object({
+        currentPassword: z.string().min(1, 'Current password is required'),
+        newPassword: z.string().min(8, 'Password must be at least 8 characters'),
+        confirmPassword: z.string(),
+    })
+    .refine((data) => data.newPassword === data.confirmPassword, {
+        message: "Passwords don't match",
+        path: ['confirmPassword'],
+    })
+    .refine((data) => data.currentPassword !== data.newPassword, {
+        message: 'New password must be different from current password',
+        path: ['newPassword'],
+    });
+
+export type LoginFormData = z.infer<typeof loginSchema>;
+export type SignupFormData = z.infer<typeof signupSchema>;
+export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
+export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
 export type UpdateProfileFormData = z.infer<typeof updateProfileSchema>;
+export type ChangeEmaiFormData = z.infer<typeof changeEmailSchema>;
