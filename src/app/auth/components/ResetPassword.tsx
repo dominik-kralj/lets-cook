@@ -1,56 +1,84 @@
 'use client';
 
-import { Button, Container, Field, Heading, Input, Text, VStack } from '@chakra-ui/react';
+import { Button, Container, Field, Heading, Input, Spinner, Text, VStack } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { toaster } from '@/components/chakra-ui/toaster';
 import { FormCard } from '@/components/ui/FormCard';
 import { Link } from '@/components/ui/Link';
+import { createClient } from '@/lib/supabase/client';
 import { ResetPasswordFormData, resetPasswordSchema } from '@/models/user';
-
-import { resetPasswordAction } from '../actions';
 
 export function ResetPassword() {
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const [isValidToken, setIsValidToken] = useState(true);
-
-    const code = searchParams.get('code');
+    const [isValidating, setIsValidating] = useState(true);
+    const [isValid, setIsValid] = useState(false);
+    const [countdown, setCountdown] = useState(0);
+    const [isSuccess, setIsSuccess] = useState(false);
 
     useEffect(() => {
-        if (!code) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setIsValidToken(false);
-            toaster.create({
-                title: 'Invalid reset link',
-                description: 'Please request a new password reset link.',
-                type: 'error',
-            });
+        const checkAuth = async () => {
+            const supabase = createClient();
+            const {
+                data: { user },
+                error,
+            } = await supabase.auth.getUser();
+
+            if (user && !error) {
+                setIsValid(true);
+            } else {
+                setIsValid(false);
+            }
+
+            setIsValidating(false);
+        };
+
+        checkAuth();
+    }, []);
+
+    useEffect(() => {
+        if (countdown > 0) {
+            const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+            return () => clearTimeout(timer);
         }
-    }, [code]);
+    }, [countdown]);
 
     const {
         register,
         handleSubmit,
-        formState: { errors, isSubmitting, isValid, isDirty },
+        setError,
+        formState: { errors, isSubmitting, isValid: isFormValid, isDirty },
     } = useForm<ResetPasswordFormData>({
         resolver: zodResolver(resetPasswordSchema),
-        mode: 'onBlur',
+        mode: 'onChange',
     });
 
     const onSubmit = async (data: ResetPasswordFormData) => {
-        if (!code) return;
-
         try {
-            const response = await resetPasswordAction(data.password);
+            const supabase = createClient();
 
-            if (response?.error) {
+            const { error } = await supabase.auth.updateUser({
+                password: data.password,
+            });
+
+            if (error) {
+                if (
+                    error.message.toLowerCase().includes('same') ||
+                    error.message.toLowerCase().includes('different')
+                ) {
+                    setError('password', {
+                        type: 'manual',
+                        message: 'New password must be different from your old password',
+                    });
+                    return;
+                }
+
                 toaster.create({
                     title: 'Failed to reset password',
-                    description: response.error,
+                    description: error.message,
                     type: 'error',
                 });
                 return;
@@ -62,9 +90,9 @@ export function ResetPassword() {
                 type: 'success',
             });
 
-            router.push('/auth?mode=login');
-        } catch (error: unknown) {
-            console.error('Error caught:', error);
+            setIsSuccess(true);
+        } catch (error: any) {
+            console.error('Error resetting password:', error);
             toaster.create({
                 title: 'Something went wrong',
                 description: 'Please try again later.',
@@ -73,33 +101,92 @@ export function ResetPassword() {
         }
     };
 
-    if (!isValidToken) {
+    const handleRequestNewLink = () => {
+        setCountdown(30);
+        router.push('/auth/forgot-password');
+    };
+
+    if (isValidating) {
         return (
             <Container maxW="md">
                 <VStack
-                    gap="component"
+                    gap="section"
+                    align="center"
+                    p={12}
+                    borderRadius="xl"
+                    borderWidth="1px"
+                    bg="fills.surfaces.cardElevated"
+                    boxShadow="sm"
+                >
+                    <Spinner size="xl" />
+                    <Text color="textAndIcons.onSurfaces.helper">Validating reset link...</Text>
+                </VStack>
+            </Container>
+        );
+    }
+
+    if (isSuccess) {
+        return (
+            <Container maxW="md">
+                <VStack
+                    gap="section"
                     align="stretch"
-                    p={8}
+                    p={12}
+                    borderRadius="xl"
+                    borderWidth="1px"
+                    bg="fills.surfaces.cardElevated"
+                    boxShadow="sm"
+                >
+                    <VStack gap="component" textAlign="center">
+                        <Heading as="h2" fontSize="4xl" color="textAndIcons.onSurfaces.lead">
+                            Password Reset Successfully
+                        </Heading>
+                        <Text color="textAndIcons.onSurfaces.helper" fontSize="lg">
+                            Your password has been updated. You can now log in with your new
+                            password.
+                        </Text>
+                    </VStack>
+
+                    <Link href="/auth?mode=login" textDecoration="none">
+                        <Button size="lg" width="full">
+                            Go to Login
+                        </Button>
+                    </Link>
+                </VStack>
+            </Container>
+        );
+    }
+
+    if (!isValid) {
+        return (
+            <Container maxW="md">
+                <VStack
+                    gap="section"
+                    align="stretch"
+                    p={12}
                     borderRadius="xl"
                     borderWidth="1px"
                     borderColor="outlines.withControlsNeutral.default"
                     bg="fills.surfaces.cardElevated"
                     boxShadow="sm"
                 >
-                    <VStack gap="element" textAlign="center">
+                    <VStack gap="component" textAlign="center">
                         <Heading as="h2" fontSize="4xl" color="textAndIcons.onSurfaces.lead">
                             Invalid Link
                         </Heading>
-                        <Text color="textAndIcons.onSurfaces.helper">
+                        <Text color="textAndIcons.onSurfaces.helper" fontSize="lg">
                             This password reset link is invalid or has expired.
                         </Text>
                     </VStack>
 
-                    <Link href="/auth/forgot-password">
-                        <Button size="lg" width="full">
-                            Request New Link
-                        </Button>
-                    </Link>
+                    <Button
+                        size="lg"
+                        width="full"
+                        onClick={handleRequestNewLink}
+                        disabled={countdown > 0}
+                    >
+                        {countdown > 0 ? `Request New Link (${countdown}s)` : 'Request New Link'}
+                    </Button>
                 </VStack>
             </Container>
         );
@@ -112,7 +199,7 @@ export function ResetPassword() {
             onSubmit={handleSubmit(onSubmit)}
             submitButtonText="Reset Password"
             isSubmitting={isSubmitting}
-            isDisabled={!isDirty || !isValid || isSubmitting}
+            isDisabled={!isDirty || !isFormValid || isSubmitting}
             footerText="Remember your password?"
             footerLinkText="Log in"
             footerLinkHref="/auth?mode=login"

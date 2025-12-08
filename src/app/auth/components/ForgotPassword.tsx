@@ -2,7 +2,7 @@
 
 import { Field, Input } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { toaster } from '@/components/chakra-ui/toaster';
@@ -12,7 +12,7 @@ import { ForgotPasswordFormData, forgotPasswordSchema } from '@/models/user';
 import { forgotPasswordAction } from '../actions';
 
 export function ForgotPassword() {
-    const router = useRouter();
+    const [countdown, setCountdown] = useState(0);
 
     const {
         register,
@@ -42,7 +42,17 @@ export function ForgotPassword() {
                 type: 'success',
             });
 
-            router.push('/auth?mode=login');
+            setCountdown(60);
+
+            const timer = setInterval(() => {
+                setCountdown((prev) => {
+                    if (prev <= 1) {
+                        clearInterval(timer);
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
         } catch (error: unknown) {
             console.error('Error caught:', error);
             toaster.create({
@@ -58,9 +68,9 @@ export function ForgotPassword() {
             title="Forgot Password?"
             subtitle="Enter your email and we'll send you a reset link"
             onSubmit={handleSubmit(onSubmit)}
-            submitButtonText="Send Reset Link"
+            submitButtonText={countdown > 0 ? `Resend in ${countdown}s` : 'Send Reset Link'}
             isSubmitting={isSubmitting}
-            isDisabled={!isDirty || !isValid || isSubmitting}
+            isDisabled={!isDirty || !isValid || isSubmitting || countdown > 0}
             footerText="Remember your password?"
             footerLinkText="Log in"
             footerLinkHref="/auth?mode=login"

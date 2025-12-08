@@ -49,9 +49,15 @@ export function DeleteAccount() {
                 borderWidth="1px"
             >
                 <Card.Header>
-                    <Flex justify="space-between" align="center" w="full">
-                        <HStack gap="tight">
-                            <LuShieldAlert size={20} />
+                    <Flex
+                        justify="space-between"
+                        align={{ base: 'start', md: 'center' }}
+                        w="full"
+                        direction={{ base: 'column', md: 'row' }}
+                        gap="component"
+                    >
+                        <HStack gap="tight" align="start">
+                            <LuShieldAlert size={20} style={{ flexShrink: 0, marginTop: '2px' }} />
                             <VStack align="start" gap="0">
                                 <Card.Title color="textAndIcons.onSurfaces.destructive">
                                     Delete Account
@@ -61,7 +67,12 @@ export function DeleteAccount() {
                                 </Card.Description>
                             </VStack>
                         </HStack>
-                        <Button variant="outline" onClick={() => setOpen(true)}>
+                        <Button
+                            variant="outline"
+                            onClick={() => setOpen(true)}
+                            w={{ base: 'full', md: 'auto' }}
+                            flexShrink={0}
+                        >
                             Delete Account
                         </Button>
                     </Flex>

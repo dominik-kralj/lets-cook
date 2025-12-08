@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 
 import { toaster } from '@/components/chakra-ui/toaster';
 import { FormCard } from '@/components/ui/FormCard';
-import { SignupDto, signupSchema } from '@/models/user';
+import { SignupFormData, signupSchema } from '@/models/user';
 
 import { signupAction } from '../actions';
 
@@ -20,12 +20,12 @@ export function Signup() {
         formState: { errors, isSubmitting, isValid, isDirty },
         reset,
         setError,
-    } = useForm<SignupDto>({
+    } = useForm<SignupFormData>({
         resolver: zodResolver(signupSchema),
         mode: 'onBlur',
     });
 
-    const onSubmit = async (data: SignupDto) => {
+    const onSubmit = async (data: SignupFormData) => {
         try {
             const response = await signupAction(data);
 

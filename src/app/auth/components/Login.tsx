@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { toaster } from '@/components/chakra-ui/toaster';
 import { FormCard } from '@/components/ui/FormCard';
 import { Link } from '@/components/ui/Link';
-import { LoginDto, loginSchema } from '@/models/user';
+import { LoginFormData, loginSchema } from '@/models/user';
 
 import { loginAction } from '../actions';
 
@@ -20,12 +20,12 @@ export function Login() {
         handleSubmit,
         formState: { errors, isSubmitting, isValid, isDirty },
         reset,
-    } = useForm<LoginDto>({
+    } = useForm<LoginFormData>({
         resolver: zodResolver(loginSchema),
         mode: 'onBlur',
     });
 
-    const onSubmit = async (data: LoginDto) => {
+    const onSubmit = async (data: LoginFormData) => {
         try {
             const response = await loginAction(data);
 

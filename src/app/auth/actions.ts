@@ -124,22 +124,6 @@ export async function forgotPasswordAction(email: string) {
     return { success: true };
 }
 
-export async function resetPasswordAction(newPassword: string) {
-    const supabase = await createClient();
-
-    const { error } = await supabase.auth.updateUser({
-        password: newPassword,
-    });
-
-    if (error) {
-        return {
-            error: error.message,
-        };
-    }
-
-    return { success: true };
-}
-
 export async function resendConfirmationEmailAction(email: string) {
     const supabase = await createClient();
 
