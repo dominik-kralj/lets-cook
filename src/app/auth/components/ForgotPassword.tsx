@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 
 import { toaster } from '@/components/chakra-ui/toaster';
 import { FormCard } from '@/components/ui/FormCard';
-import { ForgotPasswordDto, forgotPasswordSchema } from '@/models/user';
+import { ForgotPasswordFormData, forgotPasswordSchema } from '@/models/user';
 
 import { forgotPasswordAction } from '../actions';
 
@@ -18,12 +18,12 @@ export function ForgotPassword() {
         register,
         handleSubmit,
         formState: { errors, isSubmitting, isValid, isDirty },
-    } = useForm<ForgotPasswordDto>({
+    } = useForm<ForgotPasswordFormData>({
         resolver: zodResolver(forgotPasswordSchema),
         mode: 'onBlur',
     });
 
-    const onSubmit = async (data: ForgotPasswordDto) => {
+    const onSubmit = async (data: ForgotPasswordFormData) => {
         try {
             const response = await forgotPasswordAction(data.email);
 

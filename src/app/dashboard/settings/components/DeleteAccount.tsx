@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, Dialog, HStack, Portal, Text, VStack } from '@chakra-ui/react';
+import { Button, Card, Dialog, Flex, HStack, Portal, Text, VStack } from '@chakra-ui/react';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { useState } from 'react';
 import { LuShieldAlert } from 'react-icons/lu';
@@ -49,27 +49,29 @@ export function DeleteAccount() {
                 borderWidth="1px"
             >
                 <Card.Header>
-                    <HStack gap="tight">
-                        <LuShieldAlert size={20} />
-                        <Card.Title color="textAndIcons.onSurfaces.destructive">
+                    <Flex justify="space-between" align="center" w="full">
+                        <HStack gap="tight">
+                            <LuShieldAlert size={20} />
+                            <VStack align="start" gap="0">
+                                <Card.Title color="textAndIcons.onSurfaces.destructive">
+                                    Delete Account
+                                </Card.Title>
+                                <Card.Description color="textAndIcons.onSurfaces.destructive">
+                                    Permanently remove your account and all associated data
+                                </Card.Description>
+                            </VStack>
+                        </HStack>
+                        <Button variant="outline" onClick={() => setOpen(true)}>
                             Delete Account
-                        </Card.Title>
-                    </HStack>
-                    <Card.Description color="textAndIcons.onSurfaces.destructive">
-                        Permanently remove your account and all associated data
-                    </Card.Description>
+                        </Button>
+                    </Flex>
                 </Card.Header>
 
                 <Card.Body>
-                    <VStack align="start" gap="component">
-                        <Text fontSize="sm" color="textAndIcons.onSurfaces.destructiveHelper">
-                            Once you delete your account, there is no going back. All your recipes,
-                            collections, and favorites will be permanently deleted.
-                        </Text>
-                        <Button variant="outline" onClick={() => setOpen(true)} w="fit">
-                            Delete Account
-                        </Button>
-                    </VStack>
+                    <Text fontSize="sm" color="textAndIcons.onSurfaces.destructiveHelper">
+                        Once you delete your account, there is no going back. All your recipes,
+                        collections, and favorites will be permanently deleted.
+                    </Text>
                 </Card.Body>
             </Card.Root>
 
