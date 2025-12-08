@@ -1,8 +1,9 @@
 'use client';
 
-import { Button, Card, Dialog, Portal, Text, VStack } from '@chakra-ui/react';
+import { Button, Card, Dialog, HStack, Portal, Text, VStack } from '@chakra-ui/react';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { useState } from 'react';
+import { LuShieldAlert } from 'react-icons/lu';
 
 import { toaster } from '@/components/chakra-ui/toaster';
 
@@ -42,26 +43,30 @@ export function DeleteAccount() {
 
     return (
         <>
-            <Card.Root borderColor="red.500" borderWidth="1px">
+            <Card.Root
+                bg="fills.surfaces.destructive"
+                borderColor="outlines.withSurfaces.destructive"
+                borderWidth="1px"
+            >
                 <Card.Header>
-                    <Card.Title color="red.500">Danger Zone</Card.Title>
-                    <Card.Description>
-                        Permanently delete your account and all data
+                    <HStack gap="tight">
+                        <LuShieldAlert size={20} />
+                        <Card.Title color="textAndIcons.onSurfaces.destructive">
+                            Delete Account
+                        </Card.Title>
+                    </HStack>
+                    <Card.Description color="textAndIcons.onSurfaces.destructive">
+                        Permanently remove your account and all associated data
                     </Card.Description>
                 </Card.Header>
 
                 <Card.Body>
                     <VStack align="start" gap="component">
-                        <Text fontSize="sm" color="textAndIcons.onSurfaces.helper">
+                        <Text fontSize="sm" color="textAndIcons.onSurfaces.destructiveHelper">
                             Once you delete your account, there is no going back. All your recipes,
                             collections, and favorites will be permanently deleted.
                         </Text>
-                        <Button
-                            colorPalette="red"
-                            variant="outline"
-                            onClick={() => setOpen(true)}
-                            w="fit"
-                        >
+                        <Button variant="outline" onClick={() => setOpen(true)} w="fit">
                             Delete Account
                         </Button>
                     </VStack>
@@ -88,11 +93,7 @@ export function DeleteAccount() {
                                 <Dialog.ActionTrigger asChild>
                                     <Button variant="outline">Cancel</Button>
                                 </Dialog.ActionTrigger>
-                                <Button
-                                    colorPalette="red"
-                                    onClick={handleDelete}
-                                    loading={isDeleting}
-                                >
+                                <Button onClick={handleDelete} loading={isDeleting}>
                                     Delete Permanently
                                 </Button>
                             </Dialog.Footer>

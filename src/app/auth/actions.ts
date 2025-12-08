@@ -1,5 +1,8 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+
 import { AUTH_ERRORS } from '@/lib/errors';
 import prisma from '@/lib/prisma/db';
 import { createClient } from '@/lib/supabase/server';
@@ -100,16 +103,9 @@ export async function loginAction(data: LoginFormData) {
 
 export async function logoutAction() {
     const supabase = await createClient();
-
-    const { error } = await supabase.auth.signOut();
-
-    if (error) {
-        return {
-            error: error.message,
-        };
-    }
-
-    return { success: true };
+    await supabase.auth.signOut();
+    revalidatePath('/', 'layout');
+    redirect('/');
 }
 
 export async function forgotPasswordAction(email: string) {

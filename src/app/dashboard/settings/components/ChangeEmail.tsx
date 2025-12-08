@@ -1,11 +1,12 @@
 'use client';
 
-import { Button, Card, Field, Input, VStack } from '@chakra-ui/react';
+import { Button, Card, Field, HStack, Input, VStack } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { LuMail } from 'react-icons/lu';
 
 import { toaster } from '@/components/chakra-ui/toaster';
-import { ChangeEmaiFormData, changeEmailSchema } from '@/models/user';
+import { ChangeEmailFormData, changeEmailSchema } from '@/models/user';
 
 import { changeEmailAction } from '../actions';
 
@@ -19,16 +20,16 @@ export function ChangeEmail({ currentEmail }: ChangeEmailProps) {
         handleSubmit,
         formState: { errors, isSubmitting, isDirty, isValid },
         reset,
-    } = useForm<ChangeEmaiFormData>({
+    } = useForm<ChangeEmailFormData>({
         resolver: zodResolver(changeEmailSchema),
         defaultValues: {
             currentEmail: currentEmail,
             newEmail: '',
         },
-        mode: 'onBlur',
+        mode: 'onChange',
     });
 
-    const onSubmit = async (data: ChangeEmaiFormData) => {
+    const onSubmit = async (data: ChangeEmailFormData) => {
         try {
             if (data.currentEmail !== currentEmail) {
                 toaster.create({
@@ -70,9 +71,12 @@ export function ChangeEmail({ currentEmail }: ChangeEmailProps) {
     };
 
     return (
-        <Card.Root maxW="3xl">
+        <Card.Root>
             <Card.Header>
-                <Card.Title>Email Settings</Card.Title>
+                <HStack gap="tight">
+                    <LuMail size={20} />
+                    <Card.Title>Email Settings</Card.Title>
+                </HStack>
                 <Card.Description>Update your email address</Card.Description>
             </Card.Header>
 
@@ -117,7 +121,7 @@ export function ChangeEmail({ currentEmail }: ChangeEmailProps) {
                         <Button
                             type="submit"
                             loading={isSubmitting}
-                            disabled={!isDirty || !isValid || isSubmitting}
+                            disabled={!isDirty || !isValid}
                             w="fit"
                         >
                             Update Email

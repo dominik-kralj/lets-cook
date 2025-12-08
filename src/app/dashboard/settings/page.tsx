@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Heading, Spinner, Text, VStack } from '@chakra-ui/react';
+import { Box, Container, Heading, Spinner, Text, VStack } from '@chakra-ui/react';
 
 import { logoutAction } from '@/app/auth/actions';
 import { useProfile } from '@/hooks/useProfile';
@@ -36,29 +36,28 @@ export default function SettingsPage() {
 
     return (
         <DashboardLayout>
-            <VStack align="stretch" gap="component">
-                <Box>
-                    <Heading
-                        as="h1"
-                        fontSize={{ base: '2xl', md: '3xl' }}
-                        color="textAndIcons.onSurfaces.lead"
-                        mb="tight"
-                    >
-                        Settings
-                    </Heading>
-                    <Text color="textAndIcons.onSurfaces.helper">
-                        Manage your account settings and preferences
-                    </Text>
-                </Box>
+            <Container maxW="3xl" py="component">
+                <VStack align="stretch" gap="component">
+                    <Box textAlign="center" mb="element">
+                        <Heading
+                            as="h1"
+                            fontSize={{ base: '2xl', md: '3xl' }}
+                            color="textAndIcons.onSurfaces.lead"
+                            mb="tight"
+                        >
+                            Settings
+                        </Heading>
+                        <Text color="textAndIcons.onSurfaces.helper">
+                            Manage your account settings and preferences
+                        </Text>
+                    </Box>
 
-                <ChangeEmail currentEmail={profile.email} />
-
-                <ChangePassword />
-
-                <Logout />
-
-                <DeleteAccount />
-            </VStack>
+                    <ChangeEmail currentEmail={profile.email} />
+                    <ChangePassword />
+                    <Logout />
+                    <DeleteAccount />
+                </VStack>
+            </Container>
         </DashboardLayout>
     );
 }

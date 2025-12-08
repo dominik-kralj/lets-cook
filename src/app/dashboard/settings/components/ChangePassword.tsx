@@ -1,8 +1,9 @@
 'use client';
 
-import { Button, Card, Field, Input, VStack } from '@chakra-ui/react';
+import { Button, Card, Field, HStack, Input, VStack } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { LuLock } from 'react-icons/lu';
 
 import { toaster } from '@/components/chakra-ui/toaster';
 import { ChangePasswordFormData, changePasswordSchema } from '@/models/user';
@@ -17,7 +18,7 @@ export function ChangePassword() {
         reset,
     } = useForm<ChangePasswordFormData>({
         resolver: zodResolver(changePasswordSchema),
-        mode: 'onBlur',
+        mode: 'onChange',
     });
 
     const onSubmit = async (data: ChangePasswordFormData) => {
@@ -51,9 +52,12 @@ export function ChangePassword() {
     };
 
     return (
-        <Card.Root maxW="3xl">
+        <Card.Root>
             <Card.Header>
-                <Card.Title>Password Settings</Card.Title>
+                <HStack gap="tight">
+                    <LuLock size={20} />
+                    <Card.Title>Password Settings</Card.Title>
+                </HStack>
                 <Card.Description>Change your password</Card.Description>
             </Card.Header>
 

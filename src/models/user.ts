@@ -74,4 +74,4 @@ export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
 export type UpdateProfileFormData = z.infer<typeof updateProfileSchema>;
-export type ChangeEmaiFormData = z.infer<typeof changeEmailSchema>;
+export type ChangeEmailFormData = z.infer<typeof changeEmailSchema>;

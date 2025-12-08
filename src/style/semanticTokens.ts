@@ -88,6 +88,9 @@ export const semanticTokens = {
                 pressed: {
                     value: { base: '{colors.secondary.2}', _dark: '{colors.neutrals.70}' },
                 },
+                destructive: {
+                    value: { base: '{colors.error.2}', _dark: '{colors.error.70}' },
+                },
             },
         },
         textAndIcons: {
@@ -138,6 +141,12 @@ export const semanticTokens = {
                 lead: {
                     value: { base: '{colors.neutrals.80}', _dark: '{colors.neutrals.0}' },
                 },
+                destructive: {
+                    value: { base: '{colors.error.60}', _dark: '{colors.error.40}' },
+                },
+                destructiveHelper: {
+                    value: { base: '{colors.error.60}', _dark: '{colors.error.15}' },
+                },
             },
         },
         outlines: {
@@ -176,6 +185,11 @@ export const semanticTokens = {
                 },
                 pressed: {
                     value: { base: '{colors.neutrals.50}', _dark: '{colors.neutrals.0}' },
+                },
+            },
+            withSurfaces: {
+                destructive: {
+                    value: { base: '{colors.error.45}', _dark: '{colors.error.40}' },
                 },
             },
         },
