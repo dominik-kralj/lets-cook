@@ -4,6 +4,7 @@ import {
     Avatar,
     Box,
     Card,
+    Container,
     Grid,
     Heading,
     HStack,
@@ -64,120 +65,123 @@ export default function ProfilePage() {
 
     return (
         <DashboardLayout>
-            <VStack align="stretch" gap="component">
-                <Box>
-                    <Heading
-                        as="h1"
-                        fontSize={{ base: '2xl', md: '3xl' }}
-                        color="textAndIcons.onSurfaces.lead"
-                        mb="tight"
-                    >
-                        Profile
-                    </Heading>
+            <Container maxW="3xl" px={{ base: 'component', md: 'section' }}>
+                <VStack align="stretch" gap="component">
+                    <Box>
+                        <Heading
+                            as="h1"
+                            fontSize={{ base: '2xl', md: '3xl' }}
+                            color="textAndIcons.onSurfaces.lead"
+                            mb="tight"
+                        >
+                            Profile
+                        </Heading>
+                        <Text color="textAndIcons.onSurfaces.helper">
+                            Manage your account information
+                        </Text>
+                    </Box>
 
-                    <Text color="textAndIcons.onSurfaces.helper">
-                        Manage your account information
-                    </Text>
-                </Box>
+                    <Card.Root>
+                        <Card.Body>
+                            <VStack gap="component" align="stretch">
+                                <HStack
+                                    justify="space-between"
+                                    align={{ base: 'start', md: 'center' }}
+                                    flexDir={{ base: 'column', md: 'row' }}
+                                    gap="component"
+                                >
+                                    <HStack gap="component" align="start">
+                                        <Avatar.Root size={{ base: 'lg', md: 'xl' }}>
+                                            <Avatar.Fallback name={profile.username} />
+                                            {profile.avatar && (
+                                                <Avatar.Image src={profile.avatar} />
+                                            )}
+                                        </Avatar.Root>
 
-                <Card.Root>
-                    <Card.Body>
-                        <VStack gap="component" align="stretch">
-                            <HStack
-                                justify="space-between"
-                                align={{ base: 'start', md: 'center' }}
-                                flexDir={{ base: 'column', md: 'row' }}
-                                gap="component"
-                            >
-                                <HStack gap="component" align="start">
-                                    <Avatar.Root size={{ base: 'lg', md: 'xl' }}>
-                                        <Avatar.Fallback name={profile.username} />
-                                        {profile.avatar && <Avatar.Image src={profile.avatar} />}
-                                    </Avatar.Root>
+                                        <VStack align="start" gap="tight">
+                                            <Heading
+                                                as="h2"
+                                                fontSize={{ base: 'xl', md: '2xl' }}
+                                                color="textAndIcons.onSurfaces.lead"
+                                            >
+                                                {profile.username}
+                                            </Heading>
 
-                                    <VStack align="start" gap="tight">
-                                        <Heading
-                                            as="h2"
-                                            fontSize={{ base: 'xl', md: '2xl' }}
-                                            color="textAndIcons.onSurfaces.lead"
-                                        >
-                                            {profile.username}
-                                        </Heading>
+                                            <Text
+                                                color="textAndIcons.onSurfaces.helper"
+                                                fontSize={{ base: 'sm', md: 'md' }}
+                                            >
+                                                {profile.email}
+                                            </Text>
 
-                                        <Text
-                                            color="textAndIcons.onSurfaces.helper"
-                                            fontSize={{ base: 'sm', md: 'md' }}
-                                        >
-                                            {profile.email}
-                                        </Text>
+                                            {profile.bio && (
+                                                <Text
+                                                    fontSize="sm"
+                                                    color="textAndIcons.onSurfaces.lead"
+                                                    maxW="md"
+                                                >
+                                                    {profile.bio}
+                                                </Text>
+                                            )}
 
-                                        {profile.bio && (
                                             <Text
                                                 fontSize="sm"
-                                                color="textAndIcons.onSurfaces.lead"
-                                                maxW="md"
+                                                color="textAndIcons.onSurfaces.helper"
+                                                fontWeight="medium"
                                             >
-                                                {profile.bio}
+                                                {`Member since ${formatDate(profile.createdAt)}`}
                                             </Text>
-                                        )}
+                                        </VStack>
+                                    </HStack>
 
-                                        <Text
-                                            fontSize="sm"
-                                            color="textAndIcons.onSurfaces.helper"
-                                            fontWeight="medium"
-                                        >
-                                            {`Member since ${formatDate(profile.createdAt)}`}
-                                        </Text>
-                                    </VStack>
-                                </HStack>
-
-                                <Box alignSelf="flex-start">
-                                    <EditProfileDialog profile={profile} onUpdate={mutate} />
-                                </Box>
-                            </HStack>
-                        </VStack>
-                    </Card.Body>
-                </Card.Root>
-
-                <Grid templateColumns={{ base: '1fr', sm: 'repeat(3, 1fr)' }} gap="component">
-                    {statistics.map((stat) => (
-                        <Card.Root key={stat.label}>
-                            <Card.Body>
-                                <HStack gap="component" align="start">
-                                    <Box
-                                        p={3}
-                                        bg="fills.actionsBrandStrong.default"
-                                        borderRadius="lg"
-                                        color="textAndIcons.onControlsBrand.default"
-                                        flexShrink={0}
-                                    >
-                                        <Icon size="lg">
-                                            <stat.icon />
-                                        </Icon>
+                                    <Box alignSelf="flex-start">
+                                        <EditProfileDialog profile={profile} onUpdate={mutate} />
                                     </Box>
-                                    <VStack align="start" gap="tight">
-                                        <Heading
-                                            as="h3"
-                                            fontSize={{ base: '2xl', md: '3xl' }}
-                                            color="textAndIcons.onSurfaces.lead"
-                                            fontWeight="bold"
-                                        >
-                                            {stat.count}
-                                        </Heading>
-                                        <Text
-                                            color="textAndIcons.onSurfaces.helper"
-                                            fontWeight="medium"
-                                            fontSize={{ base: 'sm', md: 'md' }}
-                                        >
-                                            {stat.label}
-                                        </Text>
-                                    </VStack>
                                 </HStack>
-                            </Card.Body>
-                        </Card.Root>
-                    ))}
-                </Grid>
-            </VStack>
+                            </VStack>
+                        </Card.Body>
+                    </Card.Root>
+
+                    <Grid templateColumns={{ base: '1fr', sm: 'repeat(3, 1fr)' }} gap="component">
+                        {statistics.map((stat) => (
+                            <Card.Root key={stat.label}>
+                                <Card.Body>
+                                    <HStack gap="component" align="start">
+                                        <Box
+                                            p={2}
+                                            bg="fills.actionsBrandStrong.default"
+                                            borderRadius="lg"
+                                            color="textAndIcons.onControlsBrand.default"
+                                            flexShrink={0}
+                                        >
+                                            <Icon size="md">
+                                                <stat.icon />
+                                            </Icon>
+                                        </Box>
+                                        <VStack align="start" gap="tight">
+                                            <Heading
+                                                as="h3"
+                                                fontSize={{ base: '2xl', md: '3xl' }}
+                                                color="textAndIcons.onSurfaces.lead"
+                                                fontWeight="bold"
+                                            >
+                                                {stat.count}
+                                            </Heading>
+                                            <Text
+                                                color="textAndIcons.onSurfaces.helper"
+                                                fontWeight="medium"
+                                                fontSize={{ base: 'sm', md: 'md' }}
+                                            >
+                                                {stat.label}
+                                            </Text>
+                                        </VStack>
+                                    </HStack>
+                                </Card.Body>
+                            </Card.Root>
+                        ))}
+                    </Grid>
+                </VStack>
+            </Container>
         </DashboardLayout>
     );
 }

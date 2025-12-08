@@ -36,9 +36,9 @@ export default function SettingsPage() {
 
     return (
         <DashboardLayout>
-            <Container maxW="3xl" py="component">
+            <Container maxW="3xl" px={{ base: 'component', md: 'section' }}>
                 <VStack align="stretch" gap="component">
-                    <Box textAlign="center" mb="element">
+                    <Box>
                         <Heading
                             as="h1"
                             fontSize={{ base: '2xl', md: '3xl' }}
