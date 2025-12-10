@@ -42,4 +42,20 @@ export const inputRecipe = defineRecipe({
             },
         },
     },
+    variants: {
+        variant: {
+            outline: {
+                bg: 'fills.surfaces.cardDefault',
+
+                _hover: {
+                    borderColor: 'fills.actionsBrandStrong.hover',
+                    bg: 'fills.surfaces.cardDefault',
+                },
+                _focus: {
+                    borderColor: 'fills.actionsBrandStrong.default',
+                    bg: 'fills.surfaces.cardDefault',
+                },
+            },
+        },
+    },
 });

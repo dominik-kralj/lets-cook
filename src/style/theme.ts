@@ -6,6 +6,7 @@ import { cardRecipe } from './components/cardRecipe';
 import { inputRecipe } from './components/inputRecipe';
 import { linkRecipe } from './components/linkRecipe';
 import { spinnerRecipe } from './components/spinnerRecipe';
+import { tabsRecipe } from './components/tabsRecipe';
 import { textareaRecipe } from './components/textareaRecipe';
 import { semanticTokens } from './semanticTokens';
 import { spacing } from './spacing';
@@ -24,6 +25,7 @@ const config = defineConfig({
         },
         slotRecipes: {
             card: cardRecipe,
+            tabs: tabsRecipe,
         },
     },
 });
