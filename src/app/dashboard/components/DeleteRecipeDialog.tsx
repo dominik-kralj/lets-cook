@@ -86,7 +86,7 @@ export function DeleteRecipeDialog({
                         </Dialog.Body>
 
                         <Dialog.Footer>
-                            <Dialog.ActionTrigger>
+                            <Dialog.ActionTrigger asChild>
                                 <Button variant="outline" type="button">
                                     Cancel
                                 </Button>
