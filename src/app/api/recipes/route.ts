@@ -21,6 +21,9 @@ export async function GET() {
                 description: true,
                 cookTime: true,
                 imageUrl: true,
+                ingredients: true,
+                instructions: true,
+                isFavorite: true,
             },
             orderBy: { createdAt: 'desc' },
         });

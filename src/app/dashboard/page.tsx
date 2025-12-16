@@ -7,7 +7,6 @@ import {
     HStack,
     Icon,
     Input,
-    SimpleGrid,
     Spinner,
     Text,
     VStack,
@@ -15,22 +14,22 @@ import {
 import { useState } from 'react';
 import { RiRestaurantLine, RiSearchLine } from 'react-icons/ri';
 
-import { logoutAction } from '@/app/auth/actions';
 import { useProfile } from '@/hooks/useProfile';
 import { useRecipes } from '@/hooks/useRecipes';
 import { Recipe } from '@/types/recipe';
 
+import { logoutAction } from '../auth/actions';
 import { AddRecipeDialog } from './components/AddRecipeDialog';
 import { DashboardLayout } from './components/DashsboardLayout';
 import { RecipeCard } from './components/RecipeCard';
 
 export default function RecipesPage() {
-    const { profile, isLoading, isError } = useProfile();
+    const { profile, isLoading: isProfileLoading, isError } = useProfile();
+    const { recipes, isLoading: isRecipesLoading, mutate } = useRecipes();
+
     const [searchQuery, setSearchQuery] = useState('');
 
-    const { recipes, isLoading: recipesLoading } = useRecipes();
-
-    if (isLoading || recipesLoading) {
+    if (isProfileLoading || isRecipesLoading) {
         return (
             <DashboardLayout>
                 <Box
@@ -59,7 +58,6 @@ export default function RecipesPage() {
         <DashboardLayout scrollable={false}>
             <Container maxW="6xl" px={{ base: 'component', md: 'section' }} h="100vh">
                 <VStack align="stretch" gap="component" h="100vh">
-                    {/* Sticky Header */}
                     <Box position="sticky" top={0} zIndex={10} bg="surfaces.default" pb="component">
                         <HStack
                             justify="space-between"
@@ -86,7 +84,7 @@ export default function RecipesPage() {
                                 display="flex"
                                 justifyContent="center"
                             >
-                                <AddRecipeDialog />
+                                <AddRecipeDialog onRecipeAdd={mutate} />
                             </Box>
                         </HStack>
 
@@ -109,8 +107,15 @@ export default function RecipesPage() {
                         </HStack>
                     </Box>
 
-                    {/* Scrollable Recipes */}
-                    <Box flex="1" overflowY="auto">
+                    <Box
+                        flex="1"
+                        overflowY="auto"
+                        css={{
+                            '&::-webkit-scrollbar': { display: 'none' },
+                            scrollbarWidth: 'none',
+                            msOverflowStyle: 'none',
+                        }}
+                    >
                         {filteredRecipes.length === 0 ? (
                             <Box
                                 display="flex"
@@ -145,11 +150,16 @@ export default function RecipesPage() {
                                 </Text>
                             </Box>
                         ) : (
-                            <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} gap={6}>
+                            <VStack align="stretch" gap={4} mt={1} pb={6}>
                                 {filteredRecipes.map((recipe: Recipe) => (
-                                    <RecipeCard key={recipe.id} recipe={recipe} />
+                                    <RecipeCard
+                                        key={recipe.id}
+                                        recipe={recipe}
+                                        onRecipeDelete={mutate}
+                                        onRecipeEdit={mutate}
+                                    />
                                 ))}
-                            </SimpleGrid>
+                            </VStack>
                         )}
                     </Box>
                 </VStack>

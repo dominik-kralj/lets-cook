@@ -1,4 +1,3 @@
-// src/app/dashboard/collections/page.tsx
 'use client';
 
 import { Box, Container, Heading, Text, VStack } from '@chakra-ui/react';

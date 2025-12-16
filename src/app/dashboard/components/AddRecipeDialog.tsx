@@ -27,24 +27,28 @@ import {
     RiInformationLine,
     RiRestaurantLine,
 } from 'react-icons/ri';
+import { KeyedMutator } from 'swr';
 
 import { createRecipeAction, uploadRecipeImage } from '@/app/dashboard/actions';
 import { toaster } from '@/components/chakra-ui/toaster';
-import { useRecipes } from '@/hooks/useRecipes';
 import { defaultRecipeValues, RecipeFormData, recipeSchema } from '@/models/recipe';
+import { Recipe } from '@/types/recipe';
 import { validateImageFile } from '@/utils/helper';
 
-export function AddRecipeDialog() {
-    const { mutate } = useRecipes();
+interface AddRecipeDialogProps {
+    onRecipeAdd: KeyedMutator<Recipe[]>;
+}
 
+export function AddRecipeDialog({ onRecipeAdd }: AddRecipeDialogProps) {
     const [open, setOpen] = useState(false);
     const [imageFile, setImageFile] = useState<File | null>(null);
+    const [fileUploadKey, setFileUploadKey] = useState(0);
 
     const {
         register,
         control,
         handleSubmit,
-        formState: { errors, isSubmitting, isValid },
+        formState: { errors, isValid, isSubmitting },
         reset,
     } = useForm<RecipeFormData>({
         resolver: zodResolver(recipeSchema),
@@ -89,73 +93,64 @@ export function AddRecipeDialog() {
     };
 
     const onSubmit = async (data: RecipeFormData) => {
-        try {
-            const { title, cookTime, ingredients, instructions, description, imageUrl } = data;
+        let imgUrl = data.imageUrl;
 
-            let imgUrl = imageUrl;
+        if (imageFile) {
+            const uploadedUrl = await uploadRecipeImage(imageFile);
 
-            if (imageFile) {
-                const uploadedUrl = await uploadRecipeImage(imageFile);
-
-                if (!uploadedUrl) {
-                    toaster.create({
-                        title: 'Failed to upload image',
-                        description: 'Please try again',
-                        type: 'error',
-                    });
-                    return;
-                }
-
-                imgUrl = uploadedUrl;
-            }
-
-            const payload = {
-                title: title,
-                cookTime: cookTime,
-                ingredients: ingredients,
-                instructions: instructions,
-                description: description?.trim() ? description : undefined,
-                imageUrl: imgUrl?.trim() ? imgUrl : undefined,
-            };
-
-            const response = await createRecipeAction(payload);
-
-            if (response.error) {
+            if (!uploadedUrl) {
                 toaster.create({
-                    title: 'Error',
-                    description: response.error,
+                    title: 'Failed to upload image',
+                    description: 'Please try again',
                     type: 'error',
                 });
                 return;
             }
 
-            toaster.create({
-                title: 'Success',
-                description: 'Recipe created successfully!',
-                type: 'success',
-            });
+            imgUrl = uploadedUrl;
+        }
 
-            reset();
-            setImageFile(null);
-            setOpen(false);
-            await mutate();
-        } catch (error) {
-            console.error('Error creating recipe:', error);
+        const payload = {
+            title: data.title,
+            cookTime: data.cookTime,
+            ingredients: data.ingredients,
+            instructions: data.instructions,
+            description: data.description?.trim() || undefined,
+            imageUrl: imgUrl?.trim() || undefined,
+        };
 
+        const result = await createRecipeAction(payload);
+
+        if (result.error) {
             toaster.create({
-                title: 'Something went wrong',
-                description: 'Please try again later.',
+                title: 'Error',
+                description: result.error,
                 type: 'error',
             });
+            return;
         }
+
+        onRecipeAdd();
+
+        toaster.create({
+            title: 'Success',
+            description: 'Recipe created successfully!',
+            type: 'success',
+        });
+
+        reset();
+        setImageFile(null);
+        setOpen(false);
     };
 
     const handleOpenChange = (details: { open: boolean }) => {
-        setOpen(details.open);
+        if (!isSubmitting) {
+            setOpen(details.open);
 
-        if (!details.open) {
-            reset();
-            setImageFile(null);
+            if (!details.open) {
+                reset();
+                setImageFile(null);
+            }
         }
     };
 
@@ -173,19 +168,18 @@ export function AddRecipeDialog() {
 
                 <Dialog.Positioner px={{ base: 'element', md: 0 }}>
                     <Dialog.Content minH="500px">
-                        <Dialog.CloseTrigger asChild>
-                            <CloseButton size="sm" />
-                        </Dialog.CloseTrigger>
-
                         <Dialog.Header>
                             <Dialog.Title>Add New Recipe</Dialog.Title>
+                            <Dialog.CloseTrigger asChild>
+                                <CloseButton size="sm" disabled={isSubmitting} />
+                            </Dialog.CloseTrigger>
                         </Dialog.Header>
 
                         <form onSubmit={handleSubmit(onSubmit)}>
                             <Dialog.Body>
                                 <Tabs.Root defaultValue="details" fitted>
                                     <Tabs.List mb="component">
-                                        <Tabs.Trigger value="details">
+                                        <Tabs.Trigger value="details" disabled={isSubmitting}>
                                             <Icon fontSize={{ base: 'sm', md: 'md' }}>
                                                 <RiInformationLine />
                                             </Icon>
@@ -194,7 +188,7 @@ export function AddRecipeDialog() {
                                             </Text>
                                         </Tabs.Trigger>
 
-                                        <Tabs.Trigger value="ingredients">
+                                        <Tabs.Trigger value="ingredients" disabled={isSubmitting}>
                                             <Icon fontSize={{ base: 'sm', md: 'md' }}>
                                                 <RiRestaurantLine />
                                             </Icon>
@@ -203,7 +197,7 @@ export function AddRecipeDialog() {
                                             </Text>
                                         </Tabs.Trigger>
 
-                                        <Tabs.Trigger value="instructions">
+                                        <Tabs.Trigger value="instructions" disabled={isSubmitting}>
                                             <Icon fontSize={{ base: 'sm', md: 'md' }}>
                                                 <RiFileListLine />
                                             </Icon>
@@ -218,9 +212,11 @@ export function AddRecipeDialog() {
                                             <Field.Root invalid={!!errors.imageUrl}>
                                                 <Field.Label>Recipe Image</Field.Label>
                                                 <FileUpload.Root
+                                                    key={fileUploadKey}
                                                     maxFiles={1}
                                                     accept="image/*"
                                                     onFileChange={handleFileChange}
+                                                    disabled={isSubmitting}
                                                 >
                                                     <FileUpload.HiddenInput />
                                                     <FileUpload.Dropzone w="full" cursor="pointer">
@@ -241,15 +237,49 @@ export function AddRecipeDialog() {
                                                                 fontSize="xs"
                                                                 color="textAndIcons.onSurfaces.subdued"
                                                             >
-                                                                PNG, JPG up to 10MB
+                                                                PNG, JPG up to 2MB
                                                             </Text>
                                                         </FileUpload.DropzoneContent>
                                                     </FileUpload.Dropzone>
                                                 </FileUpload.Root>
                                                 {imageFile && (
-                                                    <Text fontSize="sm" color="green.600">
-                                                        ✓ {imageFile.name}
-                                                    </Text>
+                                                    <HStack
+                                                        mt="element"
+                                                        p="element"
+                                                        borderRadius="md"
+                                                        bg="fills.surfaces.soft"
+                                                        borderWidth="1px"
+                                                        borderColor="borders.default"
+                                                        justify="space-between"
+                                                        w="full"
+                                                    >
+                                                        <VStack align="start" gap="0" flex="1">
+                                                            <Text
+                                                                fontSize="sm"
+                                                                fontWeight="medium"
+                                                                color="textAndIcons.onSurfaces.lead"
+                                                            >
+                                                                {imageFile.name}
+                                                            </Text>
+                                                            <Text
+                                                                fontSize="xs"
+                                                                color="textAndIcons.onSurfaces.helper"
+                                                            >
+                                                                {(imageFile.size / 1024).toFixed(2)}{' '}
+                                                                KB
+                                                            </Text>
+                                                        </VStack>
+                                                        <CloseButton
+                                                            size="sm"
+                                                            onClick={() => {
+                                                                setImageFile(null);
+                                                                setFileUploadKey(
+                                                                    (prev) => prev + 1,
+                                                                );
+                                                            }}
+                                                            aria-label="Remove file"
+                                                        />
+                                                    </HStack>
                                                 )}
                                                 {errors.imageUrl && (
                                                     <Field.ErrorText>
@@ -263,6 +293,7 @@ export function AddRecipeDialog() {
                                                 <Input
                                                     {...register('title')}
                                                     placeholder="e.g., Homemade Pasta"
+                                                    disabled={isSubmitting}
                                                 />
                                                 {errors.title && (
                                                     <Field.ErrorText>
@@ -277,6 +308,7 @@ export function AddRecipeDialog() {
                                                     {...register('cookTime')}
                                                     type="number"
                                                     placeholder="e.g., 45"
+                                                    disabled={isSubmitting}
                                                 />
                                                 {errors.cookTime && (
                                                     <Field.ErrorText>
@@ -291,6 +323,7 @@ export function AddRecipeDialog() {
                                                     {...register('description')}
                                                     placeholder="A brief description of your recipe..."
                                                     minH="100px"
+                                                    disabled={isSubmitting}
                                                 />
                                                 {errors.description && (
                                                     <Field.ErrorText>
@@ -335,6 +368,7 @@ export function AddRecipeDialog() {
                                                             placeholder="e.g., 2 cups flour"
                                                             size="sm"
                                                             flex={1}
+                                                            disabled={isSubmitting}
                                                         />
                                                         {ingredientFields.length > 1 && (
                                                             <IconButton
@@ -345,10 +379,9 @@ export function AddRecipeDialog() {
                                                                     removeIngredient(index)
                                                                 }
                                                                 aria-label="Remove ingredient"
+                                                                disabled={isSubmitting}
                                                             >
-                                                                <Icon>
-                                                                    <RiDeleteBin6Line />
-                                                                </Icon>
+                                                                <RiDeleteBin6Line />
                                                             </IconButton>
                                                         )}
                                                     </HStack>
@@ -367,6 +400,7 @@ export function AddRecipeDialog() {
                                                 size="md"
                                                 w="full"
                                                 onClick={() => appendIngredient({ value: '' })}
+                                                disabled={isSubmitting}
                                             >
                                                 <RiAddLine />
                                                 Add Ingredient
@@ -408,6 +442,7 @@ export function AddRecipeDialog() {
                                                             placeholder={`e.g., Mix all ingredients`}
                                                             size="sm"
                                                             flex={1}
+                                                            disabled={isSubmitting}
                                                         />
                                                         {instructionFields.length > 1 && (
                                                             <IconButton
@@ -418,10 +453,9 @@ export function AddRecipeDialog() {
                                                                     removeInstruction(index)
                                                                 }
                                                                 aria-label="Remove instruction"
+                                                                disabled={isSubmitting}
                                                             >
-                                                                <Icon>
-                                                                    <RiDeleteBin6Line />
-                                                                </Icon>
+                                                                <RiDeleteBin6Line />
                                                             </IconButton>
                                                         )}
                                                     </HStack>
@@ -440,6 +474,7 @@ export function AddRecipeDialog() {
                                                 size="md"
                                                 w="full"
                                                 onClick={() => appendInstruction({ value: '' })}
+                                                disabled={isSubmitting}
                                             >
                                                 <RiAddLine />
                                                 Add Step
@@ -450,12 +485,19 @@ export function AddRecipeDialog() {
                             </Dialog.Body>
 
                             <Dialog.Footer>
-                                <Dialog.ActionTrigger asChild>
-                                    <Button variant="outline" type="button">
-                                        Cancel
-                                    </Button>
-                                </Dialog.ActionTrigger>
-                                <Button type="submit" loading={isSubmitting} disabled={!isValid}>
+                                <Button
+                                    variant="outline"
+                                    type="button"
+                                    onClick={() => setOpen(false)}
+                                    disabled={isSubmitting}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    loading={isSubmitting}
+                                    disabled={!isValid || isSubmitting}
+                                >
                                     Create Recipe
                                 </Button>
                             </Dialog.Footer>

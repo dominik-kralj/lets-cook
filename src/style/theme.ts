@@ -3,6 +3,7 @@ import { createSystem, defaultConfig, defineConfig } from '@chakra-ui/react';
 import { colors } from './colors';
 import { buttonRecipe } from './components/buttonRecipe';
 import { cardRecipe } from './components/cardRecipe';
+import { fileUploadSlotRecipe } from './components/fileUploadRecipe';
 import { inputRecipe } from './components/inputRecipe';
 import { linkRecipe } from './components/linkRecipe';
 import { spinnerRecipe } from './components/spinnerRecipe';
@@ -26,6 +27,7 @@ const config = defineConfig({
         slotRecipes: {
             card: cardRecipe,
             tabs: tabsRecipe,
+            fileUpload: fileUploadSlotRecipe,
         },
     },
 });

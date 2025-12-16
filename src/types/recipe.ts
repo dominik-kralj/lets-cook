@@ -1,9 +1,10 @@
 export interface Recipe {
     id: string;
     title: string;
+    cookTime: number;
+    ingredients: string[];
+    instructions: string[];
+    isFavorite: boolean;
     description?: string;
-    cookTime: string;
     imageUrl?: string;
-    ingredients: { value: string }[];
-    instructions: { value: string }[];
 }

@@ -1,273 +1,534 @@
 'use client';
 
 import {
-    Box,
     Button,
-    DialogActionTrigger,
-    DialogBackdrop,
-    DialogBody,
-    DialogCloseTrigger,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogRoot,
-    DialogTitle,
+    CloseButton,
+    Dialog,
     Field,
+    FileUpload,
     HStack,
     Icon,
     IconButton,
-    Image,
     Input,
+    Portal,
+    Tabs,
     Text,
     Textarea,
     VStack,
 } from '@chakra-ui/react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
-import { RiAddLine, RiCloseLine, RiImageAddLine } from 'react-icons/ri';
+import { useFieldArray, useForm } from 'react-hook-form';
+import {
+    RiAddLine,
+    RiDeleteBin6Line,
+    RiFileListLine,
+    RiImageAddLine,
+    RiInformationLine,
+    RiRestaurantLine,
+} from 'react-icons/ri';
+import { KeyedMutator } from 'swr';
 
-interface RecipeDialogProps {
-    isOpen: boolean;
-    onClose: () => void;
-    recipeId?: string | null;
+import { updateRecipeAction, uploadRecipeImage } from '@/app/dashboard/actions';
+import { toaster } from '@/components/chakra-ui/toaster';
+import { RecipeFormData, recipeSchema } from '@/models/recipe';
+import { Recipe } from '@/types/recipe';
+import { validateImageFile } from '@/utils/helper';
+
+interface EditRecipeDialogProps {
+    recipe: Recipe;
+    onRecipeEdit: KeyedMutator<Recipe[]>;
+    children?: React.ReactNode;
 }
 
-export function EditRecipeDialog({ isOpen, onClose, recipeId }: RecipeDialogProps) {
-    const [imageUrl, setImageUrl] = useState('');
-    const [ingredients, setIngredients] = useState(['']);
-    const [instructions, setInstructions] = useState(['']);
+export function EditRecipeDialog({ recipe, onRecipeEdit, children }: EditRecipeDialogProps) {
+    const [open, setOpen] = useState(false);
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [fileUploadKey, setFileUploadKey] = useState(0);
 
-    const isEditMode = !!recipeId;
+    const {
+        register,
+        control,
+        handleSubmit,
+        formState: { errors, isValid, dirtyFields, isDirty, isSubmitting },
+        reset,
+    } = useForm<RecipeFormData>({
+        resolver: zodResolver(recipeSchema),
+        defaultValues: {
+            title: recipe?.title,
+            cookTime: recipe?.cookTime.toString(),
+            description: recipe?.description || '',
+            imageUrl: recipe?.imageUrl || '',
+            ingredients: recipe?.ingredients?.map((ing) => ({ value: ing })),
+            instructions: recipe?.instructions?.map((inst) => ({ value: inst })),
+        },
+        mode: 'onChange',
+    });
 
-    const handleAddIngredient = () => {
-        setIngredients([...ingredients, '']);
+    const {
+        fields: ingredientFields,
+        append: appendIngredient,
+        remove: removeIngredient,
+    } = useFieldArray({
+        control,
+        name: 'ingredients',
+    });
+
+    const {
+        fields: instructionFields,
+        append: appendInstruction,
+        remove: removeInstruction,
+    } = useFieldArray({
+        control,
+        name: 'instructions',
+    });
+
+    const handleFileChange = (details: { acceptedFiles: File[] }) => {
+        const file = details.acceptedFiles[0];
+        if (!file) return;
+
+        const validation = validateImageFile(file);
+
+        if (!validation.valid) {
+            toaster.create({
+                title: 'Invalid file',
+                description: validation.error,
+                type: 'error',
+            });
+            return;
+        }
+
+        setImageFile(file);
     };
 
-    const handleRemoveIngredient = (index: number) => {
-        setIngredients(ingredients.filter((_, i) => i !== index));
+    const onSubmit = async (data: RecipeFormData) => {
+        const payload: Partial<RecipeFormData> = {};
+
+        if (dirtyFields.title) payload.title = data.title;
+        if (dirtyFields.cookTime) payload.cookTime = data.cookTime;
+        if (dirtyFields.description) payload.description = data.description?.trim() || undefined;
+        if (dirtyFields.ingredients) payload.ingredients = data.ingredients;
+        if (dirtyFields.instructions) payload.instructions = data.instructions;
+
+        if (imageFile) {
+            const uploadedUrl = await uploadRecipeImage(imageFile);
+
+            if (!uploadedUrl) {
+                toaster.create({
+                    title: 'Failed to upload image',
+                    description: 'Please try again',
+                    type: 'error',
+                });
+                return;
+            }
+
+            payload.imageUrl = uploadedUrl;
+        } else if (dirtyFields.imageUrl) {
+            payload.imageUrl = data.imageUrl?.trim() || undefined;
+        }
+
+        const result = await updateRecipeAction(recipe.id, payload);
+
+        if (result.error) {
+            toaster.create({
+                title: 'Error',
+                description: result.error,
+                type: 'error',
+            });
+            return;
+        }
+
+        onRecipeEdit();
+
+        toaster.create({
+            title: 'Success',
+            description: 'Recipe updated successfully!',
+            type: 'success',
+        });
+
+        setImageFile(null);
+        reset();
+        setOpen(false);
     };
 
-    const handleAddInstruction = () => {
-        setInstructions([...instructions, '']);
-    };
+    const handleOpenChange = (details: { open: boolean }) => {
+        if (!isSubmitting) {
+            setOpen(details.open);
 
-    const handleRemoveInstruction = (index: number) => {
-        setInstructions(instructions.filter((_, i) => i !== index));
+            if (details.open) {
+                reset({
+                    title: recipe.title,
+                    cookTime: recipe.cookTime.toString(),
+                    description: recipe.description || '',
+                    imageUrl: recipe.imageUrl || '',
+                    ingredients: recipe.ingredients?.map((ing) => ({ value: ing })) || [
+                        { value: '' },
+                    ],
+                    instructions: recipe.instructions?.map((inst) => ({ value: inst })) || [
+                        { value: '' },
+                    ],
+                });
+                setImageFile(null);
+            }
+        }
     };
 
     return (
-        <DialogRoot open={isOpen} onOpenChange={(e) => !e.open && onClose()} size="lg">
-            <DialogBackdrop />
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>{isEditMode ? 'Edit Recipe' : 'Create New Recipe'}</DialogTitle>
-                    <DialogCloseTrigger />
-                </DialogHeader>
+        <Dialog.Root open={open} onOpenChange={handleOpenChange} placement="center" size="lg">
+            {children && <Dialog.Trigger asChild>{children}</Dialog.Trigger>}
 
-                <DialogBody>
-                    <VStack align="stretch" gap="component">
-                        {/* Recipe Image */}
-                        <Field.Root>
-                            <Field.Label>Recipe Image</Field.Label>
-                            <VStack gap="element">
-                                {imageUrl ? (
-                                    <Box position="relative" w="full">
-                                        <Image
-                                            src={imageUrl}
-                                            alt="Recipe preview"
-                                            aspectRatio="16/9"
-                                            objectFit="cover"
-                                            borderRadius="md"
-                                        />
-                                        <IconButton
-                                            position="absolute"
-                                            top={2}
-                                            right={2}
-                                            size="sm"
-                                            variant="subtle"
-                                            bg="fills.surfaces.cardDefault"
-                                            onClick={() => setImageUrl('')}
-                                        >
-                                            <Icon>
-                                                <RiCloseLine />
+            <Portal>
+                <Dialog.Backdrop />
+
+                <Dialog.Positioner px={{ base: 'element', md: 0 }}>
+                    <Dialog.Content minH="500px">
+                        <Dialog.Header>
+                            <Dialog.Title>Edit Recipe</Dialog.Title>
+                            <Dialog.CloseTrigger asChild>
+                                <CloseButton size="sm" disabled={isSubmitting} />
+                            </Dialog.CloseTrigger>
+                        </Dialog.Header>
+
+                        <form onSubmit={handleSubmit(onSubmit)}>
+                            <Dialog.Body>
+                                <Tabs.Root defaultValue="details" fitted>
+                                    <Tabs.List mb="component">
+                                        <Tabs.Trigger value="details" disabled={isSubmitting}>
+                                            <Icon fontSize={{ base: 'sm', md: 'md' }}>
+                                                <RiInformationLine />
                                             </Icon>
-                                        </IconButton>
-                                    </Box>
-                                ) : (
-                                    <Box
-                                        aspectRatio="16/9"
-                                        borderWidth="2px"
-                                        borderStyle="dashed"
-                                        borderColor="outlines.withControlsNeutral.default"
-                                        borderRadius="md"
-                                        display="flex"
-                                        flexDirection="column"
-                                        alignItems="center"
-                                        justifyContent="center"
-                                        gap="element"
-                                        p="component"
-                                        cursor="pointer"
-                                        _hover={{
-                                            borderColor: 'fills.actionsBrandStrong.default',
-                                        }}
-                                    >
-                                        <Icon fontSize="4xl" color="textAndIcons.onSurfaces.helper">
-                                            <RiImageAddLine />
-                                        </Icon>
-                                        <VStack gap="0">
-                                            <Text
-                                                fontSize="sm"
-                                                color="textAndIcons.onSurfaces.helper"
-                                            >
-                                                Click to upload or drag and drop
+                                            <Text display={{ base: 'none', sm: 'block' }}>
+                                                Details
                                             </Text>
-                                            <Text
-                                                fontSize="xs"
-                                                color="textAndIcons.onSurfaces.subdued"
-                                            >
-                                                PNG, JPG up to 10MB
+                                        </Tabs.Trigger>
+
+                                        <Tabs.Trigger value="ingredients" disabled={isSubmitting}>
+                                            <Icon fontSize={{ base: 'sm', md: 'md' }}>
+                                                <RiRestaurantLine />
+                                            </Icon>
+                                            <Text display={{ base: 'none', sm: 'block' }}>
+                                                Ingredients
                                             </Text>
+                                        </Tabs.Trigger>
+
+                                        <Tabs.Trigger value="instructions" disabled={isSubmitting}>
+                                            <Icon fontSize={{ base: 'sm', md: 'md' }}>
+                                                <RiFileListLine />
+                                            </Icon>
+                                            <Text display={{ base: 'none', sm: 'block' }}>
+                                                Instructions
+                                            </Text>
+                                        </Tabs.Trigger>
+                                    </Tabs.List>
+
+                                    <Tabs.Content value="details">
+                                        <VStack align="stretch" gap="component">
+                                            <Field.Root invalid={!!errors.imageUrl}>
+                                                <Field.Label>Recipe Image</Field.Label>
+                                                <FileUpload.Root
+                                                    key={fileUploadKey}
+                                                    maxFiles={1}
+                                                    accept="image/*"
+                                                    onFileChange={handleFileChange}
+                                                    disabled={isSubmitting}
+                                                >
+                                                    <FileUpload.HiddenInput />
+                                                    <FileUpload.Dropzone w="full" cursor="pointer">
+                                                        <Icon
+                                                            fontSize="4xl"
+                                                            color="textAndIcons.onSurfaces.helper"
+                                                        >
+                                                            <RiImageAddLine />
+                                                        </Icon>
+                                                        <FileUpload.DropzoneContent>
+                                                            <Text
+                                                                fontSize="sm"
+                                                                color="textAndIcons.onSurfaces.helper"
+                                                            >
+                                                                Click to upload or drag and drop
+                                                            </Text>
+                                                            <Text
+                                                                fontSize="xs"
+                                                                color="textAndIcons.onSurfaces.subdued"
+                                                            >
+                                                                PNG, JPG up to 2MB
+                                                            </Text>
+                                                        </FileUpload.DropzoneContent>
+                                                    </FileUpload.Dropzone>
+                                                </FileUpload.Root>
+                                                {imageFile && (
+                                                    <HStack
+                                                        mt="element"
+                                                        p="element"
+                                                        borderRadius="md"
+                                                        bg="fills.surfaces.soft"
+                                                        borderWidth="1px"
+                                                        borderColor="borders.default"
+                                                        justify="space-between"
+                                                        w="full"
+                                                    >
+                                                        <VStack align="start" gap="0" flex="1">
+                                                            <Text
+                                                                fontSize="sm"
+                                                                fontWeight="medium"
+                                                                color="textAndIcons.onSurfaces.lead"
+                                                            >
+                                                                {imageFile.name}
+                                                            </Text>
+                                                            <Text
+                                                                fontSize="xs"
+                                                                color="textAndIcons.onSurfaces.helper"
+                                                            >
+                                                                {(imageFile.size / 1024).toFixed(2)}{' '}
+                                                                KB
+                                                            </Text>
+                                                        </VStack>
+                                                        <CloseButton
+                                                            size="sm"
+                                                            onClick={() => {
+                                                                setImageFile(null);
+                                                                setFileUploadKey(
+                                                                    (prev) => prev + 1,
+                                                                );
+                                                            }}
+                                                            aria-label="Remove file"
+                                                        />
+                                                    </HStack>
+                                                )}
+                                                {!imageFile && recipe.imageUrl && (
+                                                    <Text
+                                                        fontSize="sm"
+                                                        mt="element"
+                                                        color="textAndIcons.onSurfaces.helper"
+                                                    >
+                                                        Current image:{' '}
+                                                        {recipe.imageUrl.split('/').pop()}
+                                                    </Text>
+                                                )}
+                                                {errors.imageUrl && (
+                                                    <Field.ErrorText>
+                                                        {errors.imageUrl.message}
+                                                    </Field.ErrorText>
+                                                )}
+                                            </Field.Root>
+
+                                            <Field.Root required invalid={!!errors.title}>
+                                                <Field.Label>Recipe Title</Field.Label>
+                                                <Input
+                                                    {...register('title')}
+                                                    placeholder="e.g., Homemade Pasta"
+                                                    disabled={isSubmitting}
+                                                />
+                                                {errors.title && (
+                                                    <Field.ErrorText>
+                                                        {errors.title.message}
+                                                    </Field.ErrorText>
+                                                )}
+                                            </Field.Root>
+
+                                            <Field.Root required invalid={!!errors.cookTime}>
+                                                <Field.Label>Cook Time (minutes)</Field.Label>
+                                                <Input
+                                                    {...register('cookTime')}
+                                                    type="number"
+                                                    placeholder="e.g., 45"
+                                                    disabled={isSubmitting}
+                                                />
+                                                {errors.cookTime && (
+                                                    <Field.ErrorText>
+                                                        {errors.cookTime.message}
+                                                    </Field.ErrorText>
+                                                )}
+                                            </Field.Root>
+
+                                            <Field.Root invalid={!!errors.description}>
+                                                <Field.Label>Description</Field.Label>
+                                                <Textarea
+                                                    {...register('description')}
+                                                    placeholder="A brief description of your recipe..."
+                                                    minH="100px"
+                                                    disabled={isSubmitting}
+                                                />
+                                                {errors.description && (
+                                                    <Field.ErrorText>
+                                                        {errors.description.message}
+                                                    </Field.ErrorText>
+                                                )}
+                                            </Field.Root>
                                         </VStack>
-                                    </Box>
-                                )}
-                                <Input
-                                    placeholder="Or paste image URL..."
-                                    value={imageUrl}
-                                    onChange={(e) => setImageUrl(e.target.value)}
-                                    size="sm"
-                                />
-                            </VStack>
-                        </Field.Root>
+                                    </Tabs.Content>
 
-                        {/* Recipe Title */}
-                        <Field.Root required>
-                            <Field.Label>Recipe Title</Field.Label>
-                            <Input placeholder="e.g., Homemade Pasta" />
-                        </Field.Root>
-
-                        {/* Cook Time */}
-                        <Field.Root>
-                            <Field.Label>Cook Time</Field.Label>
-                            <Input type="number" placeholder="e.g., 45 min" />
-                        </Field.Root>
-
-                        {/* Description */}
-                        <Field.Root>
-                            <Field.Label>Description</Field.Label>
-                            <Textarea
-                                placeholder="A brief description of your recipe..."
-                                rows={3}
-                            />
-                        </Field.Root>
-
-                        {/* Ingredients */}
-                        <Field.Root>
-                            <Field.Label>Ingredients</Field.Label>
-                            <VStack align="stretch" gap="element">
-                                {ingredients.map((ingredient, index) => (
-                                    <HStack key={index} gap="element">
-                                        <Input
-                                            placeholder={`Ingredient ${index + 1}`}
-                                            value={ingredient}
-                                            onChange={(e) => {
-                                                const newIngredients = [...ingredients];
-                                                newIngredients[index] = e.target.value;
-                                                setIngredients(newIngredients);
-                                            }}
-                                        />
-                                        {ingredients.length > 1 && (
-                                            <IconButton
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => handleRemoveIngredient(index)}
+                                    <Tabs.Content value="ingredients">
+                                        <VStack align="stretch" gap="element">
+                                            <Text fontSize="sm" color="gray.500" mb={2}>
+                                                Edit your recipe ingredients.
+                                            </Text>
+                                            {ingredientFields.map((field, index) => (
+                                                <Field.Root
+                                                    key={field.id}
+                                                    required
+                                                    invalid={!!errors.ingredients?.[index]?.value}
+                                                >
+                                                    <HStack gap="element" align="center" w="100%">
+                                                        <Text
+                                                            minW="8"
+                                                            h="8"
+                                                            display="flex"
+                                                            alignItems="center"
+                                                            justifyContent="center"
+                                                            borderRadius="md"
+                                                            bg="fills.actionsBrandStrong.default"
+                                                            color="textAndIcons.onControlsBrand.default"
+                                                            fontWeight="bold"
+                                                            fontSize="sm"
+                                                            flexShrink={0}
+                                                        >
+                                                            {index + 1}
+                                                        </Text>
+                                                        <Input
+                                                            {...register(
+                                                                `ingredients.${index}.value` as const,
+                                                            )}
+                                                            placeholder="e.g., 2 cups flour"
+                                                            size="sm"
+                                                            flex={1}
+                                                            disabled={isSubmitting}
+                                                        />
+                                                        {ingredientFields.length > 1 && (
+                                                            <IconButton
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                colorPalette="red"
+                                                                onClick={() =>
+                                                                    removeIngredient(index)
+                                                                }
+                                                                aria-label="Remove ingredient"
+                                                                disabled={isSubmitting}
+                                                            >
+                                                                <RiDeleteBin6Line />
+                                                            </IconButton>
+                                                        )}
+                                                    </HStack>
+                                                    {errors.ingredients?.[index]?.value && (
+                                                        <Field.ErrorText>
+                                                            {
+                                                                errors.ingredients[index]?.value
+                                                                    ?.message
+                                                            }
+                                                        </Field.ErrorText>
+                                                    )}
+                                                </Field.Root>
+                                            ))}
+                                            <Button
+                                                variant="outline"
+                                                size="md"
+                                                w="full"
+                                                onClick={() => appendIngredient({ value: '' })}
+                                                disabled={isSubmitting}
                                             >
-                                                <Icon>
-                                                    <RiCloseLine />
-                                                </Icon>
-                                            </IconButton>
-                                        )}
-                                    </HStack>
-                                ))}
+                                                <RiAddLine />
+                                                Add Ingredient
+                                            </Button>
+                                        </VStack>
+                                    </Tabs.Content>
+
+                                    <Tabs.Content value="instructions">
+                                        <VStack align="stretch" gap="element">
+                                            <Text fontSize="sm" color="gray.500" mb={2}>
+                                                Edit your recipe steps.
+                                            </Text>
+                                            {instructionFields.map((field, index) => (
+                                                <Field.Root
+                                                    key={field.id}
+                                                    required
+                                                    invalid={!!errors.instructions?.[index]?.value}
+                                                >
+                                                    <HStack gap="element" align="center" w="100%">
+                                                        <Text
+                                                            minW="8"
+                                                            h="8"
+                                                            display="flex"
+                                                            alignItems="center"
+                                                            justifyContent="center"
+                                                            borderRadius="md"
+                                                            bg="fills.actionsBrandStrong.default"
+                                                            color="textAndIcons.onControlsBrand.default"
+                                                            fontWeight="bold"
+                                                            fontSize="sm"
+                                                            flexShrink={0}
+                                                        >
+                                                            {index + 1}
+                                                        </Text>
+                                                        <Input
+                                                            {...register(
+                                                                `instructions.${index}.value` as const,
+                                                            )}
+                                                            placeholder={`e.g., Mix all ingredients`}
+                                                            size="sm"
+                                                            flex={1}
+                                                            disabled={isSubmitting}
+                                                        />
+                                                        {instructionFields.length > 1 && (
+                                                            <IconButton
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                colorPalette="red"
+                                                                onClick={() =>
+                                                                    removeInstruction(index)
+                                                                }
+                                                                aria-label="Remove instruction"
+                                                                disabled={isSubmitting}
+                                                            >
+                                                                <RiDeleteBin6Line />
+                                                            </IconButton>
+                                                        )}
+                                                    </HStack>
+                                                    {errors.instructions?.[index]?.value && (
+                                                        <Field.ErrorText>
+                                                            {
+                                                                errors.instructions[index]?.value
+                                                                    ?.message
+                                                            }
+                                                        </Field.ErrorText>
+                                                    )}
+                                                </Field.Root>
+                                            ))}
+                                            <Button
+                                                variant="outline"
+                                                size="md"
+                                                w="full"
+                                                onClick={() => appendInstruction({ value: '' })}
+                                                disabled={isSubmitting}
+                                            >
+                                                <RiAddLine />
+                                                Add Step
+                                            </Button>
+                                        </VStack>
+                                    </Tabs.Content>
+                                </Tabs.Root>
+                            </Dialog.Body>
+
+                            <Dialog.Footer>
                                 <Button
                                     variant="outline"
-                                    size="sm"
-                                    onClick={handleAddIngredient}
-                                    alignSelf="start"
+                                    type="button"
+                                    onClick={() => setOpen(false)}
+                                    disabled={isSubmitting}
                                 >
-                                    <Icon>
-                                        <RiAddLine />
-                                    </Icon>
-                                    Add Ingredient
+                                    Cancel
                                 </Button>
-                            </VStack>
-                        </Field.Root>
-
-                        {/* Instructions */}
-                        <Field.Root>
-                            <Field.Label>Instructions</Field.Label>
-                            <VStack align="stretch" gap="element">
-                                {instructions.map((instruction, index) => (
-                                    <HStack key={index} gap="element" align="start">
-                                        <Box
-                                            minW="8"
-                                            h="8"
-                                            borderRadius="md"
-                                            bg="fills.actionsBrandStrong.default"
-                                            color="textAndIcons.onControlsBrand.default"
-                                            display="flex"
-                                            alignItems="center"
-                                            justifyContent="center"
-                                            fontWeight="bold"
-                                            fontSize="sm"
-                                            flexShrink={0}
-                                        >
-                                            {index + 1}
-                                        </Box>
-                                        <Textarea
-                                            placeholder={`Step ${index + 1}`}
-                                            value={instruction}
-                                            onChange={(e) => {
-                                                const newInstructions = [...instructions];
-                                                newInstructions[index] = e.target.value;
-                                                setInstructions(newInstructions);
-                                            }}
-                                            rows={2}
-                                        />
-                                        {instructions.length > 1 && (
-                                            <IconButton
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => handleRemoveInstruction(index)}
-                                            >
-                                                <Icon>
-                                                    <RiCloseLine />
-                                                </Icon>
-                                            </IconButton>
-                                        )}
-                                    </HStack>
-                                ))}
                                 <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={handleAddInstruction}
-                                    alignSelf="start"
+                                    type="submit"
+                                    loading={isSubmitting}
+                                    disabled={!isValid || isSubmitting || !isDirty}
                                 >
-                                    <Icon>
-                                        <RiAddLine />
-                                    </Icon>
-                                    Add Step
+                                    Update Recipe
                                 </Button>
-                            </VStack>
-                        </Field.Root>
-                    </VStack>
-                </DialogBody>
-
-                <DialogFooter>
-                    <DialogActionTrigger asChild>
-                        <Button variant="outline">Cancel</Button>
-                    </DialogActionTrigger>
-                    <Button>{isEditMode ? 'Save Changes' : 'Create Recipe'}</Button>
-                </DialogFooter>
-            </DialogContent>
-        </DialogRoot>
+                            </Dialog.Footer>
+                        </form>
+                    </Dialog.Content>
+                </Dialog.Positioner>
+            </Portal>
+        </Dialog.Root>
     );
 }
