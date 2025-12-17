@@ -13,7 +13,7 @@ import {
     Text,
     VStack,
 } from '@chakra-ui/react';
-import { RiBookmarkFill, RiFileListFill, RiFolderFill } from 'react-icons/ri';
+import { RiFileListFill, RiFolderFill, RiHeartFill } from 'react-icons/ri';
 
 import { logoutAction } from '@/app/auth/actions';
 import { useProfile } from '@/hooks/useProfile';
@@ -57,7 +57,7 @@ export default function ProfilePage() {
             label: 'Collections',
         },
         {
-            icon: RiBookmarkFill,
+            icon: RiHeartFill,
             count: profile.statistics.favorites,
             label: 'Favorites',
         },

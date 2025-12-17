@@ -27,6 +27,7 @@ export const recipeSchema = z.object({
             }),
         )
         .min(1, 'At least one instruction is required'),
+    collectionIds: z.array(z.string()).optional(),
 });
 
 export type RecipeFormData = z.infer<typeof recipeSchema>;
@@ -38,4 +39,5 @@ export const defaultRecipeValues: RecipeFormData = {
     imageUrl: '',
     ingredients: [{ value: '' }, { value: '' }, { value: '' }, { value: '' }, { value: '' }],
     instructions: [{ value: '' }, { value: '' }, { value: '' }, { value: '' }, { value: '' }],
+    collectionIds: [],
 };

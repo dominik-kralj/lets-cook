@@ -1,8 +1,8 @@
 'use server';
 
+import db from '@/lib/prisma/db';
 import { createClient } from '@/lib/supabase/server';
 import { RecipeFormData } from '@/models/recipe';
-import { Recipe } from '@/types/recipe';
 
 export async function createRecipeAction(data: RecipeFormData) {
     try {
@@ -25,9 +25,8 @@ export async function createRecipeAction(data: RecipeFormData) {
         const ingredients = data.ingredients.map((item) => item.value);
         const instructions = data.instructions.map((item) => item.value);
 
-        const { data: recipe, error } = await supabase
-            .from('recipes')
-            .insert({
+        const recipe = await db.recipe.create({
+            data: {
                 userId: user.id,
                 title: data.title,
                 description: data.description || null,
@@ -35,14 +34,16 @@ export async function createRecipeAction(data: RecipeFormData) {
                 imageUrl: data.imageUrl || null,
                 ingredients,
                 instructions,
-            })
-            .select()
-            .single();
-
-        if (error) {
-            console.error('Error creating recipe:', error);
-            return { error: `Failed to create recipe: ${error.message}` };
-        }
+                collections:
+                    data.collectionIds && data.collectionIds.length > 0
+                        ? {
+                              create: data.collectionIds.map((collectionId) => ({
+                                  collectionId,
+                              })),
+                          }
+                        : undefined,
+            },
+        });
 
         return { data: recipe };
     } catch (error) {
@@ -84,47 +85,64 @@ export async function uploadRecipeImage(file: File): Promise<string | null> {
 }
 
 export async function updateRecipeAction(recipeId: string, updates: Partial<RecipeFormData>) {
-    const supabase = await createClient();
+    try {
+        const supabase = await createClient();
 
-    const {
-        data: { user },
-        error: userError,
-    } = await supabase.auth.getUser();
+        const {
+            data: { user },
+            error: userError,
+        } = await supabase.auth.getUser();
 
-    if (userError || !user) {
-        return { success: false, error: 'Unauthorized' };
-    }
+        if (userError || !user) {
+            return { success: false, error: 'Unauthorized' };
+        }
 
-    const updateData: Partial<Recipe> = {};
+        const updateData: {
+            title?: string;
+            cookTime?: number;
+            description?: string | null;
+            imageUrl?: string | null;
+            ingredients?: string[];
+            instructions?: string[];
+        } = {};
 
-    if (updates.title !== undefined) updateData.title = updates.title;
-    if (updates.cookTime !== undefined) updateData.cookTime = parseInt(updates.cookTime);
-    if (updates.description !== undefined)
-        updateData.description = updates.description || undefined;
-    if (updates.imageUrl !== undefined) updateData.imageUrl = updates.imageUrl || undefined;
+        if (updates.title !== undefined) updateData.title = updates.title;
+        if (updates.cookTime !== undefined) updateData.cookTime = parseInt(updates.cookTime);
+        if (updates.description !== undefined) updateData.description = updates.description || null;
+        if (updates.imageUrl !== undefined) updateData.imageUrl = updates.imageUrl || null;
 
-    if (updates.ingredients !== undefined) {
-        updateData.ingredients = updates.ingredients.map((item) => item.value);
-    }
+        if (updates.ingredients !== undefined) {
+            updateData.ingredients = updates.ingredients.map((item) => item.value);
+        }
 
-    if (updates.instructions !== undefined) {
-        updateData.instructions = updates.instructions.map((item) => item.value);
-    }
+        if (updates.instructions !== undefined) {
+            updateData.instructions = updates.instructions.map((item) => item.value);
+        }
 
-    const { data: recipe, error } = await supabase
-        .from('recipes')
-        .update(updateData)
-        .eq('id', recipeId)
-        .eq('userId', user.id)
-        .select()
-        .single();
+        const recipe = await db.recipe.update({
+            where: {
+                id: recipeId,
+                userId: user.id,
+            },
+            data: {
+                ...updateData,
+                collections:
+                    updates.collectionIds !== undefined
+                        ? {
+                              deleteMany: {},
+                              create: updates.collectionIds.map((collectionId) => ({
+                                  collectionId,
+                              })),
+                          }
+                        : undefined,
+            },
+        });
 
-    if (error) {
+        return { success: true, data: recipe };
+    } catch (error) {
         console.error('Error updating recipe:', error);
         return { success: false, error: 'Failed to update recipe' };
     }
-
-    return { success: true, data: recipe };
 }
 
 export async function deleteRecipeAction(recipeId: string) {

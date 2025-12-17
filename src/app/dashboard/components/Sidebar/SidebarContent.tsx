@@ -2,10 +2,10 @@ import { Box, Heading, IconButton, Separator, VStack } from '@chakra-ui/react';
 import { usePathname } from 'next/navigation';
 import { GiChefToque } from 'react-icons/gi';
 import {
-    RiBookmarkLine,
     RiCloseLine,
     RiFileListLine,
     RiFolderLine,
+    RiHeartLine,
     RiSettings4Line,
     RiUserLine,
 } from 'react-icons/ri';
@@ -69,7 +69,7 @@ export function SidebarContent({ onClose }: SidebarContentProps) {
                 />
                 <SidebarItem
                     href="/dashboard/favorites"
-                    icon={RiBookmarkLine}
+                    icon={RiHeartLine}
                     label="Favorites"
                     isActive={pathname === '/dashboard/favorites'}
                     onClick={onClose}

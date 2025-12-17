@@ -2,6 +2,8 @@
 
 import {
     Button,
+    Checkbox,
+    CheckboxGroup,
     CloseButton,
     Dialog,
     Field,
@@ -11,14 +13,15 @@ import {
     IconButton,
     Input,
     Portal,
+    Stack,
     Tabs,
     Text,
     Textarea,
     VStack,
 } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useEffect, useState } from 'react';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import {
     RiAddLine,
     RiDeleteBin6Line,
@@ -31,6 +34,8 @@ import { KeyedMutator } from 'swr';
 
 import { updateRecipeAction, uploadRecipeImage } from '@/app/dashboard/actions';
 import { toaster } from '@/components/chakra-ui/toaster';
+import { useCollections } from '@/hooks/useCollections';
+import { useRecipeCollections } from '@/hooks/useRecipeCollections';
 import { RecipeFormData, recipeSchema } from '@/models/recipe';
 import { Recipe } from '@/types/recipe';
 import { validateImageFile } from '@/utils/helper';
@@ -45,6 +50,8 @@ export function EditRecipeDialog({ recipe, onRecipeEdit, children }: EditRecipeD
     const [open, setOpen] = useState(false);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [fileUploadKey, setFileUploadKey] = useState(0);
+    const { collections } = useCollections();
+    const { collectionIds: recipeCollectionIds } = useRecipeCollections(open ? recipe?.id : null);
 
     const {
         register,
@@ -61,9 +68,24 @@ export function EditRecipeDialog({ recipe, onRecipeEdit, children }: EditRecipeD
             imageUrl: recipe?.imageUrl || '',
             ingredients: recipe?.ingredients?.map((ing) => ({ value: ing })),
             instructions: recipe?.instructions?.map((inst) => ({ value: inst })),
+            collectionIds: recipeCollectionIds || [],
         },
         mode: 'onChange',
     });
+
+    useEffect(() => {
+        if (recipeCollectionIds) {
+            reset({
+                title: recipe.title,
+                cookTime: recipe.cookTime.toString(),
+                description: recipe.description || '',
+                imageUrl: recipe.imageUrl || '',
+                ingredients: recipe.ingredients?.map((ing) => ({ value: ing })) || [{ value: '' }],
+                instructions: recipe.instructions?.map((inst) => ({ value: inst })) || [{ value: '' }],
+                collectionIds: recipeCollectionIds,
+            });
+        }
+    }, [recipeCollectionIds, recipe, reset]);
 
     const {
         fields: ingredientFields,
@@ -109,6 +131,7 @@ export function EditRecipeDialog({ recipe, onRecipeEdit, children }: EditRecipeD
         if (dirtyFields.description) payload.description = data.description?.trim() || undefined;
         if (dirtyFields.ingredients) payload.ingredients = data.ingredients;
         if (dirtyFields.instructions) payload.instructions = data.instructions;
+        if (dirtyFields.collectionIds) payload.collectionIds = data.collectionIds;
 
         if (imageFile) {
             const uploadedUrl = await uploadRecipeImage(imageFile);
@@ -167,6 +190,7 @@ export function EditRecipeDialog({ recipe, onRecipeEdit, children }: EditRecipeD
                     instructions: recipe.instructions?.map((inst) => ({ value: inst })) || [
                         { value: '' },
                     ],
+                    collectionIds: recipeCollectionIds || [],
                 });
                 setImageFile(null);
             }
@@ -355,6 +379,45 @@ export function EditRecipeDialog({ recipe, onRecipeEdit, children }: EditRecipeD
                                                     </Field.ErrorText>
                                                 )}
                                             </Field.Root>
+
+                                            <Field.Root>
+                                                <Field.Label>Add to Collections (optional)</Field.Label>
+                                                <Controller
+                                                    name="collectionIds"
+                                                    control={control}
+                                                    render={({ field }) => (
+                                                        <CheckboxGroup
+                                                            value={field.value}
+                                                            onValueChange={field.onChange}
+                                                            disabled={isSubmitting}
+                                                        >
+                                                            <Stack gap="element">
+                                                                {collections && collections.length > 0 ? (
+                                                                    collections.map((collection) => (
+                                                                        <Checkbox.Root
+                                                                            key={collection.id}
+                                                                            value={collection.id}
+                                                                        >
+                                                                            <Checkbox.HiddenInput />
+                                                                            <Checkbox.Control />
+                                                                            <Checkbox.Label>
+                                                                                {collection.name}
+                                                                            </Checkbox.Label>
+                                                                        </Checkbox.Root>
+                                                                    ))
+                                                                ) : (
+                                                                    <Text
+                                                                        fontSize="sm"
+                                                                        color="textAndIcons.onSurfaces.subdued"
+                                                                    >
+                                                                        No collections yet. Create a collection first.
+                                                                    </Text>
+                                                                )}
+                                                            </Stack>
+                                                        </CheckboxGroup>
+                                                    )}
+                                                />
+                                            </Field.Root>
                                         </VStack>
                                     </Tabs.Content>
 
@@ -520,7 +583,7 @@ export function EditRecipeDialog({ recipe, onRecipeEdit, children }: EditRecipeD
                                 <Button
                                     type="submit"
                                     loading={isSubmitting}
-                                    disabled={!isValid || isSubmitting || !isDirty}
+                                    disabled={!isValid || isSubmitting || (!isDirty && !imageFile)}
                                 >
                                     Update Recipe
                                 </Button>

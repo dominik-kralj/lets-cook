@@ -2,6 +2,8 @@
 
 import {
     Button,
+    Checkbox,
+    CheckboxGroup,
     CloseButton,
     Dialog,
     Field,
@@ -11,6 +13,7 @@ import {
     IconButton,
     Input,
     Portal,
+    Stack,
     Tabs,
     Text,
     Textarea,
@@ -18,7 +21,7 @@ import {
 } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import {
     RiAddLine,
     RiDeleteBin6Line,
@@ -31,6 +34,7 @@ import { KeyedMutator } from 'swr';
 
 import { createRecipeAction, uploadRecipeImage } from '@/app/dashboard/actions';
 import { toaster } from '@/components/chakra-ui/toaster';
+import { useCollections } from '@/hooks/useCollections';
 import { defaultRecipeValues, RecipeFormData, recipeSchema } from '@/models/recipe';
 import { Recipe } from '@/types/recipe';
 import { validateImageFile } from '@/utils/helper';
@@ -43,6 +47,7 @@ export function AddRecipeDialog({ onRecipeAdd }: AddRecipeDialogProps) {
     const [open, setOpen] = useState(false);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [fileUploadKey, setFileUploadKey] = useState(0);
+    const { collections } = useCollections();
 
     const {
         register,
@@ -117,6 +122,7 @@ export function AddRecipeDialog({ onRecipeAdd }: AddRecipeDialogProps) {
             instructions: data.instructions,
             description: data.description?.trim() || undefined,
             imageUrl: imgUrl?.trim() || undefined,
+            collectionIds: data.collectionIds || [],
         };
 
         const result = await createRecipeAction(payload);
@@ -330,6 +336,45 @@ export function AddRecipeDialog({ onRecipeAdd }: AddRecipeDialogProps) {
                                                         {errors.description.message}
                                                     </Field.ErrorText>
                                                 )}
+                                            </Field.Root>
+
+                                            <Field.Root>
+                                                <Field.Label>Add to Collections (optional)</Field.Label>
+                                                <Controller
+                                                    name="collectionIds"
+                                                    control={control}
+                                                    render={({ field }) => (
+                                                        <CheckboxGroup
+                                                            value={field.value}
+                                                            onValueChange={field.onChange}
+                                                            disabled={isSubmitting}
+                                                        >
+                                                            <Stack gap="element">
+                                                                {collections && collections.length > 0 ? (
+                                                                    collections.map((collection) => (
+                                                                        <Checkbox.Root
+                                                                            key={collection.id}
+                                                                            value={collection.id}
+                                                                        >
+                                                                            <Checkbox.HiddenInput />
+                                                                            <Checkbox.Control />
+                                                                            <Checkbox.Label>
+                                                                                {collection.name}
+                                                                            </Checkbox.Label>
+                                                                        </Checkbox.Root>
+                                                                    ))
+                                                                ) : (
+                                                                    <Text
+                                                                        fontSize="sm"
+                                                                        color="textAndIcons.onSurfaces.subdued"
+                                                                    >
+                                                                        No collections yet. Create a collection first.
+                                                                    </Text>
+                                                                )}
+                                                            </Stack>
+                                                        </CheckboxGroup>
+                                                    )}
+                                                />
                                             </Field.Root>
                                         </VStack>
                                     </Tabs.Content>

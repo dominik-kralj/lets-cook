@@ -26,7 +26,6 @@ export async function GET() {
                     select: {
                         recipes: true,
                         collections: true,
-                        favoriteRecipes: true,
                     },
                 },
             },
@@ -35,6 +34,13 @@ export async function GET() {
         if (!profile) {
             return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
         }
+
+        const favoritesCount = await db.recipe.count({
+            where: {
+                userId: user.id,
+                isFavorite: true,
+            },
+        });
 
         const { id, email, username, createdAt, _count, bio, avatar } = profile;
 
@@ -48,7 +54,7 @@ export async function GET() {
             statistics: {
                 recipes: _count.recipes,
                 collections: _count.collections,
-                favorites: _count.favoriteRecipes,
+                favorites: favoritesCount,
             },
         });
     } catch (error) {
