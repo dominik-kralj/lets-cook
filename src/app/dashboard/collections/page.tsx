@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Flex, Grid, Heading, Icon, Spinner, Text, VStack } from '@chakra-ui/react';
+import { Box, Container, Grid, Heading, HStack, Icon, Spinner, Text, VStack } from '@chakra-ui/react';
 import { RiFolder2Line } from 'react-icons/ri';
 
 import { useCollections } from '@/hooks/useCollections';
@@ -30,23 +30,35 @@ export default function CollectionsPage() {
 
     return (
         <DashboardLayout>
-            <VStack align="stretch" gap="component">
-                <Flex justify="space-between" align="start" gap="component">
-                    <Box>
-                        <Heading
-                            as="h1"
-                            fontSize="3xl"
-                            color="textAndIcons.onSurfaces.lead"
-                            mb="tight"
+            <Container maxW="6xl" px={{ base: 'component', md: 'section' }}>
+                <VStack align="stretch" gap="component">
+                    <HStack
+                        justify="space-between"
+                        align={{ base: 'stretch', md: 'start' }}
+                        flexDir={{ base: 'column', md: 'row' }}
+                        gap="component"
+                    >
+                        <Box>
+                            <Heading
+                                as="h1"
+                                fontSize={{ base: '2xl', md: '3xl' }}
+                                color="textAndIcons.onSurfaces.lead"
+                                mb="tight"
+                            >
+                                Collections
+                            </Heading>
+                            <Text color="textAndIcons.onSurfaces.helper">
+                                Organize your recipes into collections
+                            </Text>
+                        </Box>
+                        <Box
+                            w={{ base: 'full', md: 'auto' }}
+                            display="flex"
+                            justifyContent="center"
                         >
-                            Collections
-                        </Heading>
-                        <Text color="textAndIcons.onSurfaces.helper">
-                            Organize your recipes into collections
-                        </Text>
-                    </Box>
-                    <AddCollectionDialog onCollectionAdd={mutate} />
-                </Flex>
+                            <AddCollectionDialog onCollectionAdd={mutate} />
+                        </Box>
+                    </HStack>
 
                 {collections && collections.length > 0 ? (
                     <Grid
@@ -91,7 +103,8 @@ export default function CollectionsPage() {
                         </Text>
                     </Box>
                 )}
-            </VStack>
+                </VStack>
+            </Container>
         </DashboardLayout>
     );
 }

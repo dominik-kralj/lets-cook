@@ -3,7 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/prisma/db';
 import { createClient } from '@/lib/supabase/server';
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> },
+) {
     try {
         const supabase = await createClient();
 
@@ -13,9 +16,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
         if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+        const { id } = await params;
+
         const collectionRecipes = await db.collectionRecipe.findMany({
             where: {
-                recipeId: params.id,
+                recipeId: id,
                 collection: {
                     userId: user.id,
                 },

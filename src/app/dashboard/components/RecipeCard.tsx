@@ -99,8 +99,8 @@ export function RecipeCard({ recipe, onRecipeDelete, onRecipeEdit }: RecipeCardP
                     flexShrink={0}
                     bg="fills.surfaces.default"
                 />
-                <Box p={4} flex="1" display="flex" flexDirection="column" gap={1}>
-                    <Text fontWeight="bold" fontSize="lg" color="textAndIcons.onSurfaces.lead">
+                <Box p={4} pr={{ base: 16, md: 4 }} flex="1" display="flex" flexDirection="column" gap={1}>
+                    <Text fontWeight="bold" fontSize="lg" color="textAndIcons.onSurfaces.lead" lineClamp={{ base: 2, md: 1 }}>
                         {recipe.title}
                     </Text>
                     {recipe.description && (

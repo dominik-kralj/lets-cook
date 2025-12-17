@@ -32,8 +32,8 @@ export default function FavoritesPage() {
                 <VStack align="stretch" gap="component" h="100vh">
                     <Box position="sticky" top={0} zIndex={10} bg="surfaces.default" pb="component">
                         <HStack gap="tight" align="center" mb="tight">
-                            <Icon fontSize="3xl" color="status.critical.default">
-                                <RiHeartFill />
+                            <Icon fontSize="3xl">
+                                <RiHeartFill color="var(--chakra-colors-primary-40)" />
                             </Icon>
                             <Heading
                                 as="h1"

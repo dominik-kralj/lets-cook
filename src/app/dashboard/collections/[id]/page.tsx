@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Button, Flex, Grid, Heading, Icon, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Container, Heading, Icon, Spinner, Text, VStack } from '@chakra-ui/react';
 import { useParams, useRouter } from 'next/navigation';
 import { RiArrowLeftLine } from 'react-icons/ri';
 import useSWR, { KeyedMutator } from 'swr';
@@ -41,11 +41,26 @@ export default function CollectionDetailPage() {
         }) as KeyedMutator<Recipe[]>;
     };
 
+    if (isLoading) {
+        return (
+            <DashboardLayout>
+                <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    h="calc(100vh - 200px)"
+                >
+                    <Spinner />
+                </Box>
+            </DashboardLayout>
+        );
+    }
+
     return (
         <DashboardLayout>
-            <VStack align="stretch" gap="component">
-                <Flex justify="space-between" align="start" gap="component">
-                    <Box flex="1">
+            <Container maxW="6xl" px={{ base: 'component', md: 'section' }}>
+                <VStack align="stretch" gap="component">
+                    <Box>
                         <Button
                             variant="ghost"
                             size="sm"
@@ -62,7 +77,7 @@ export default function CollectionDetailPage() {
                             <>
                                 <Heading
                                     as="h1"
-                                    fontSize="3xl"
+                                    fontSize={{ base: '2xl', md: '3xl' }}
                                     color="textAndIcons.onSurfaces.lead"
                                     mb="tight"
                                 >
@@ -76,51 +91,34 @@ export default function CollectionDetailPage() {
                             </>
                         )}
                     </Box>
-                </Flex>
 
-                {isLoading ? (
-                    <Box
-                        p={6}
-                        bg="fills.surfaces.cardElevated"
-                        borderRadius="xl"
-                        borderWidth="1px"
-                        borderColor="outlines.withControlsNeutral.default"
-                    >
-                        <Text color="textAndIcons.onSurfaces.helper" textAlign="center">
-                            Loading collection...
-                        </Text>
-                    </Box>
-                ) : collection && collection.recipes && collection.recipes.length > 0 ? (
-                    <Grid
-                        templateColumns={{
-                            base: '1fr',
-                            lg: 'repeat(2, 1fr)',
-                        }}
-                        gap="component"
-                    >
-                        {collection.recipes.map((recipe) => (
-                            <RecipeCard
-                                key={recipe.id}
-                                recipe={recipe}
-                                onRecipeDelete={createRecipeMutator()}
-                                onRecipeEdit={createRecipeMutator()}
-                            />
-                        ))}
-                    </Grid>
-                ) : (
-                    <Box
-                        p={6}
-                        bg="fills.surfaces.cardElevated"
-                        borderRadius="xl"
-                        borderWidth="1px"
-                        borderColor="outlines.withControlsNeutral.default"
-                    >
-                        <Text color="textAndIcons.onSurfaces.helper" textAlign="center">
-                            No recipes in this collection yet.
-                        </Text>
-                    </Box>
-                )}
-            </VStack>
+                    {collection && collection.recipes && collection.recipes.length > 0 ? (
+                        <VStack align="stretch" gap={4}>
+                            {collection.recipes.map((recipe) => (
+                                <RecipeCard
+                                    key={recipe.id}
+                                    recipe={recipe}
+                                    onRecipeDelete={createRecipeMutator()}
+                                    onRecipeEdit={createRecipeMutator()}
+                                />
+                            ))}
+                        </VStack>
+                    ) : (
+                        <Box
+                            display="flex"
+                            flexDirection="column"
+                            alignItems="center"
+                            justifyContent="center"
+                            py="section"
+                            textAlign="center"
+                        >
+                            <Text color="textAndIcons.onSurfaces.helper">
+                                No recipes in this collection yet.
+                            </Text>
+                        </Box>
+                    )}
+                </VStack>
+            </Container>
         </DashboardLayout>
     );
 }
