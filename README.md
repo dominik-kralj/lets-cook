@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Let's Cook - Recipe Management System
 
-## Getting Started
+A full-stack application for organizing, collecting, and discovering your favorite recipes.
 
-First, run the development server:
+## Tech Stack
 
+**Frontend**: Next.js 16, React 19, TypeScript, Chakra UI v3
+**Backend**: Next.js API Routes, Prisma ORM, Supabase Auth
+**Database**: PostgreSQL
+**Storage**: Supabase Storage
+**Forms**: React Hook Form with Zod validation
+**Data Fetching**: SWR
+
+## Features
+
+- **Recipe Management**: Create, edit, and delete recipes with images, ingredients, and cooking instructions
+- **Collections**: Organize recipes into custom collections
+- **Favorites**: Mark and quickly access your favorite recipes
+- **Search**: Find recipes by title with real-time search
+- **Authentication**: Secure user authentication with Supabase
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
+
+## Setup
+
+**Install dependencies:**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**Configure database:**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create `.env` file:
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/lets_cook"
+NEXT_PUBLIC_SUPABASE_URL="your-supabase-url"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
+SUPABASE_SERVICE_ROLE_KEY="your-supabase-service-role-key"
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Setup database:
+```bash
+npx prisma generate
+npx prisma db push
+```
 
-## Learn More
+**Run development server:**
+```bash
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Open [http://localhost:3000](http://localhost:3000)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
