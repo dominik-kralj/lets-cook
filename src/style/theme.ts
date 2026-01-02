@@ -11,10 +11,18 @@ import { tabsRecipe } from './components/tabsRecipe';
 import { textareaRecipe } from './components/textareaRecipe';
 import { semanticTokens } from './semanticTokens';
 import { spacing } from './spacing';
+import { fontSizes, fontWeights, letterSpacings, lineHeights } from './typography';
 
 const config = defineConfig({
     theme: {
-        tokens: { colors, spacing },
+        tokens: {
+            colors,
+            spacing,
+            fontSizes,
+            fontWeights,
+            lineHeights,
+            letterSpacings,
+        },
         semanticTokens,
         recipes: {
             button: buttonRecipe,

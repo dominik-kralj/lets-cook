@@ -1,4 +1,4 @@
-import { Flex } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 import type { Metadata } from 'next';
 
 import { inter } from '@/assets/font';
@@ -6,7 +6,9 @@ import { Provider } from '@/components/chakra-ui/provider';
 import { Toaster } from '@/components/chakra-ui/toaster';
 
 export const metadata: Metadata = {
-    title: "Let's Cook!",
+    title: "Let's Cook - Your Personal Recipe Management System",
+    description:
+        'Organize, collect, and discover your favorite recipes. Create collections, mark favorites, and search through your personal recipe library with ease.',
 };
 
 export default function RootLayout({
@@ -18,9 +20,7 @@ export default function RootLayout({
         <html lang="en" suppressHydrationWarning className={inter.variable}>
             <body>
                 <Provider>
-                    <Flex direction="column" bg="fills.surfaces.background" minH="100vh">
-                        {children}
-                    </Flex>
+                    <VStack bg="fills.surfaces.background">{children}</VStack>
                     <Toaster />
                 </Provider>
             </body>

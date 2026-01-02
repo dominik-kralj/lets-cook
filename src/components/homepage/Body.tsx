@@ -1,101 +1,83 @@
-'use client';
-
 import {
     Box,
     Card,
-    Container,
     Grid,
     GridItem,
     Heading,
+    Icon,
     SimpleGrid,
-    Stack,
     Text,
     VStack,
 } from '@chakra-ui/react';
-import { FaBook, FaBookmark, FaEdit, FaMobileAlt, FaSearch, FaUtensils } from 'react-icons/fa';
+import { FaBook, FaBookmark, FaUtensils } from 'react-icons/fa';
 
 import { Image } from '../ui/Image';
 
 export const Body = () => {
-    const features = [
-        {
-            title: 'Save & Organize',
-            description:
-                'Add recipes with ease and keep them organized in your personal collection',
-            icon: FaBookmark,
-        },
-        {
-            title: 'Your Collection',
-            description: 'Build your digital cookbook with unlimited recipes at your fingertips',
-            icon: FaBook,
-        },
-        {
-            title: 'Cook with Ease',
-            description: 'Access your recipes anytime, anywhere, and start cooking instantly',
-            icon: FaUtensils,
-        },
-    ];
-
-    const benefits = [
-        {
-            icon: FaSearch,
-            text: 'Quick search to find any recipe instantly',
-        },
-        {
-            icon: FaEdit,
-            text: 'Edit and customize recipes to your taste',
-        },
-        {
-            icon: FaMobileAlt,
-            text: 'Works seamlessly on all your devices',
-        },
-    ];
-
     return (
-        <Container display="flex" flexDir="column" gap="container" mb="section">
+        <VStack gap="container" mb="section" p={8}>
             <VStack gap="component" textAlign="center">
                 <Heading
+                    id="features-heading"
                     as="h2"
-                    fontSize={{ base: '3xl', md: '5xl' }}
+                    fontSize="h1"
                     color="textAndIcons.onSurfaces.lead"
                 >
                     Everything you need
                 </Heading>
 
-                <Text
-                    fontSize={{ base: 'lg', md: 'xl' }}
-                    color="textAndIcons.onSurfaces.helper"
-                    maxW="2xl"
-                >
+                <Text fontSize="lead" color="textAndIcons.onSurfaces.helper">
                     A simple, beautiful way to organize all your favorite recipes in one place
                 </Text>
             </VStack>
 
             <SimpleGrid columns={{ base: 1, md: 3 }} gap="component">
-                {features.map((feature) => (
-                    <Card.Root key={feature.title}>
-                        <Card.Body>
-                            <VStack align="center" gap="component">
-                                <Box
-                                    p={3}
-                                    bg="fills.actionsBrandStrong.default"
-                                    borderRadius="lg"
-                                    color="textAndIcons.onControlsBrand.default"
-                                >
-                                    <Box as={feature.icon} boxSize={6} />
-                                </Box>
+                <Card.Root>
+                    <Card.Body alignItems="center" gap="element">
+                        <Icon boxSize={6} fill="fills.actionsBrandStrong.default">
+                            <FaBookmark />
+                        </Icon>
 
-                                <Heading as="h3" fontSize="xl" color="textAndIcons.onSurfaces.lead">
-                                    {feature.title}
-                                </Heading>
+                        <Card.Title color="textAndIcons.onSurfaces.lead">
+                            Save & Organize
+                        </Card.Title>
 
-                                <Text color="textAndIcons.onSurfaces.helper" textAlign="center">
-                                    {feature.description}
-                                </Text>
-                            </VStack>
-                        </Card.Body>
-                    </Card.Root>
-                ))}
+                        <Card.Description textAlign="center" color="textAndIcons.onSurfaces.helper">
+                            Add recipes with ease and keep them organized in your personal
+                            collection
+                        </Card.Description>
+                    </Card.Body>
+                </Card.Root>
+
+                <Card.Root>
+                    <Card.Body alignItems="center" gap="element">
+                        <Icon boxSize={6} fill="fills.actionsBrandStrong.default">
+                            <FaBook />
+                        </Icon>
+
+                        <Card.Title color="textAndIcons.onSurfaces.lead">
+                            Your Collection
+                        </Card.Title>
+
+                        <Card.Description color="textAndIcons.onSurfaces.helper" textAlign="center">
+                            Build your digital cookbook with unlimited recipes at your fingertips
+                        </Card.Description>
+                    </Card.Body>
+                </Card.Root>
+
+                <Card.Root>
+                    <Card.Body alignItems="center" gap="element">
+                        <Icon boxSize={6} fill="fills.actionsBrandStrong.default">
+                            <FaUtensils />
+                        </Icon>
+
+                        <Card.Title color="textAndIcons.onSurfaces.lead">Cook with Ease</Card.Title>
+
+                        <Card.Description color="textAndIcons.onSurfaces.helper" textAlign="center">
+                            Access your recipes anytime, anywhere, and start cooking instantly
+                        </Card.Description>
+                    </Card.Body>
+                </Card.Root>
             </SimpleGrid>
 
             <Grid
@@ -105,38 +87,55 @@ export const Body = () => {
             >
                 <GridItem>
                     <VStack align="start" gap="component">
-                        <Heading
-                            as="h2"
-                            fontSize={{ base: '3xl', md: '4xl' }}
-                            color="textAndIcons.onSurfaces.lead"
-                        >
+                        <Heading as="h2" fontSize="h2" color="textAndIcons.onSurfaces.lead">
                             Beautiful & Intuitive
                         </Heading>
 
-                        <Text
-                            fontSize={{ base: 'md', md: 'lg' }}
-                            color="textAndIcons.onSurfaces.helper"
-                        >
+                        <Text fontSize="bodyLg" color="textAndIcons.onSurfaces.helper">
                             Clean, modern design that makes managing your recipes a joy. Everything
                             you need is just a tap away.
                         </Text>
 
-                        <Stack gap="element" w="full">
-                            {benefits.map((benefit) => (
-                                <Box key={benefit.text} display="flex" alignItems="center" gap={3}>
-                                    <Box
-                                        p={2}
-                                        bg="fills.actionsBrandStrong.default"
-                                        borderRadius="md"
-                                        color="textAndIcons.onControlsBrand.default"
-                                    >
-                                        <Box as={benefit.icon} boxSize={4} />
-                                    </Box>
+                        <VStack
+                            as="ul"
+                            listStyle="outside"
+                            pl="1.25rem"
+                            gap="element"
+                            align="start"
+                        >
+                            <Box
+                                as="li"
+                                _marker={{
+                                    color: 'fills.actionsBrandStrong.default',
+                                }}
+                            >
+                                <Text color="textAndIcons.onSurfaces.lead" fontSize="bodyMd">
+                                    Quick search to find any recipe instantly
+                                </Text>
+                            </Box>
 
-                                    <Text color="textAndIcons.onSurfaces.lead">{benefit.text}</Text>
-                                </Box>
-                            ))}
-                        </Stack>
+                            <Box
+                                as="li"
+                                _marker={{
+                                    color: 'fills.actionsBrandStrong.default',
+                                }}
+                            >
+                                <Text color="textAndIcons.onSurfaces.lead" fontSize="bodyMd">
+                                    Edit and customize recipes to your taste
+                                </Text>
+                            </Box>
+
+                            <Box
+                                as="li"
+                                _marker={{
+                                    color: 'fills.actionsBrandStrong.default',
+                                }}
+                            >
+                                <Text color="textAndIcons.onSurfaces.lead" fontSize="bodyMd">
+                                    Works seamlessly on all your devices
+                                </Text>
+                            </Box>
+                        </VStack>
                     </VStack>
                 </GridItem>
 
@@ -145,14 +144,15 @@ export const Body = () => {
                         <Box position="relative" borderRadius="lg" overflow="hidden">
                             <Image
                                 src="/images/dashboard.jpg"
-                                alt="App preview"
+                                alt="Let's Cook dashboard interface showing organized recipe cards in a modern grid layout with collection management and favorites functionality"
                                 fill
+                                loading="lazy"
                                 containerProps={{ h: '400px' }}
                             />
                         </Box>
                     </Box>
                 </GridItem>
             </Grid>
-        </Container>
+        </VStack>
     );
 };

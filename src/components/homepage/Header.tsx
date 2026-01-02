@@ -7,7 +7,13 @@ import { Link } from '../ui/Link';
 export function Header() {
     return (
         <Container as="header" p={0} maxWidth="100%" position="relative">
-            <Image src="/images/hero.jpg" alt="Hero" fill containerProps={{ h: '600px' }} />
+            <Image
+                src="/images/hero.jpg"
+                alt="Delicious home-cooked meal showcasing recipe management"
+                fill
+                containerProps={{ h: '600px' }}
+                preload={true}
+            />
 
             <Box
                 position="absolute"
@@ -27,15 +33,11 @@ export function Header() {
                 gap="component"
             >
                 <VStack gap="component" textAlign="center" color="textAndIcons.onSurfaces.lead">
-                    <Heading as="h1" fontSize={{ base: '4xl', md: '6xl' }} fontWeight="bold">
+                    <Heading as="h1" fontSize="displayLg" fontWeight="bold">
                         Let&apos;s Cook
                     </Heading>
 
-                    <Text
-                        fontSize={{ base: 'lg', md: 'xl' }}
-                        maxW="2xl"
-                        color="textAndIcons.onSurfaces.helper"
-                    >
+                    <Text fontSize="lead" maxW="2xl" color="textAndIcons.onSurfaces.helper">
                         Your recipes, perfectly organized. Save, share, and cook with ease.
                     </Text>
                 </VStack>
