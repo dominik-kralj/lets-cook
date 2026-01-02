@@ -1,21 +1,11 @@
-import {
-    Box,
-    Card,
-    Grid,
-    GridItem,
-    Heading,
-    Icon,
-    SimpleGrid,
-    Text,
-    VStack,
-} from '@chakra-ui/react';
+import { Box, Card, Flex, Grid, GridItem, Heading, Icon, Text, VStack } from '@chakra-ui/react';
 import { FaBook, FaBookmark, FaUtensils } from 'react-icons/fa';
 
 import { Image } from '../ui/Image';
 
 export const Body = () => {
     return (
-        <VStack gap="container" mb="section" p={8}>
+        <VStack gap="container" mb="section" p={8} maxW="1200px">
             <VStack gap="component" textAlign="center">
                 <Heading
                     id="features-heading"
@@ -31,8 +21,13 @@ export const Body = () => {
                 </Text>
             </VStack>
 
-            <SimpleGrid columns={{ base: 1, md: 3 }} gap="component">
-                <Card.Root>
+            <Flex
+                direction={{ base: 'column', md: 'row' }}
+                justify="space-between"
+                gap="component"
+                w="100%"
+            >
+                <Card.Root maxW="340px">
                     <Card.Body alignItems="center" gap="element">
                         <Icon boxSize={6} fill="fills.actionsBrandStrong.default">
                             <FaBookmark />
@@ -49,7 +44,7 @@ export const Body = () => {
                     </Card.Body>
                 </Card.Root>
 
-                <Card.Root>
+                <Card.Root maxW="340px">
                     <Card.Body alignItems="center" gap="element">
                         <Icon boxSize={6} fill="fills.actionsBrandStrong.default">
                             <FaBook />
@@ -65,7 +60,7 @@ export const Body = () => {
                     </Card.Body>
                 </Card.Root>
 
-                <Card.Root>
+                <Card.Root maxW="340px">
                     <Card.Body alignItems="center" gap="element">
                         <Icon boxSize={6} fill="fills.actionsBrandStrong.default">
                             <FaUtensils />
@@ -78,7 +73,7 @@ export const Body = () => {
                         </Card.Description>
                     </Card.Body>
                 </Card.Root>
-            </SimpleGrid>
+            </Flex>
 
             <Grid
                 templateColumns={{ base: '1fr', lg: '1fr 1fr' }}
