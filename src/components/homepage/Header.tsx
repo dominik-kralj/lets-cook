@@ -43,14 +43,14 @@ export function Header() {
                 </VStack>
 
                 <HStack gap="element">
-                    <Button borderRadius="xl">
+                    <Button borderRadius="xl" asChild color="textAndIcons.onSurfaces.lead">
                         <Link href="/auth?mode=signup" textDecoration="none">
                             Start Cooking
                             <RiArrowRightLine />
                         </Link>
                     </Button>
 
-                    <Button variant="outline" borderRadius="xl">
+                    <Button variant="outline" borderRadius="xl" asChild>
                         <Link href="/auth?mode=login" textDecoration="none">
                             Login
                         </Link>
