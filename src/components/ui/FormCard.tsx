@@ -29,24 +29,24 @@ export function FormCard({
     isDisabled = false,
 }: FormCardProps) {
     return (
-        <Container maxW="md">
+        <Container maxW={{ base: 'sm', sm: 'md' }}>
             <VStack
-                gap="component"
+                gap="element"
                 align="stretch"
-                p={8}
+                p={{ base: 4, sm: 8 }}
                 borderRadius="xl"
                 borderWidth="1px"
                 bg="fills.surfaces.cardElevated"
-                boxShadow="sm"
             >
-                <VStack gap="element" textAlign="center">
-                    <Heading as="h2" fontSize="4xl" color="textAndIcons.onSurfaces.lead">
+                <VStack gap="tight" textAlign="center">
+                    <Heading as="h2" fontSize="3xl" color="textAndIcons.onSurfaces.lead">
                         {title}
                     </Heading>
+
                     <Text color="textAndIcons.onSurfaces.helper">{subtitle}</Text>
                 </VStack>
 
-                <Stack gap="element" as="form" onSubmit={onSubmit}>
+                <Stack as="form" onSubmit={onSubmit}>
                     {children}
 
                     <Button

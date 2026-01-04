@@ -18,9 +18,12 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" suppressHydrationWarning className={inter.variable}>
-            <body>
+            <body style={{ minHeight: '100vh', margin: 0 }}>
                 <Provider>
-                    <VStack bg="fills.surfaces.background">{children}</VStack>
+                    <VStack as="main" bg="fills.surfaces.background" minH="100vh">
+                        {children}
+                    </VStack>
+
                     <Toaster />
                 </Provider>
             </body>

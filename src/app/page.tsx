@@ -6,9 +6,7 @@ export default function Home() {
     return (
         <>
             <Header />
-            <main>
-                <Body />
-            </main>
+            <Body />
             <Footer />
         </>
     );
