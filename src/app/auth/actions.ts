@@ -19,30 +19,33 @@ export async function signupAction(data: SignupFormData) {
 
     const { username, email, password } = result.data;
 
+    const normalizedEmail = email.toLowerCase().trim();
+    const normalizedUsername = username.toLowerCase();
+
     const existingUser = await prisma.user.findFirst({
         where: {
-            OR: [{ username }, { email }],
+            OR: [{ username: normalizedUsername }, { email: normalizedEmail }],
         },
     });
 
     if (existingUser) {
         return {
             error:
-                existingUser.email === email
+                existingUser.email === normalizedEmail
                     ? AUTH_ERRORS.EMAIL_IN_USE
                     : AUTH_ERRORS.USERNAME_TAKEN,
-            field: existingUser.email === email ? 'email' : 'username',
+            field: existingUser.email === normalizedEmail ? 'email' : 'username',
         };
     }
 
     const supabase = await createClient();
 
     const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
+        email: normalizedEmail,
         password,
         options: {
             data: {
-                username,
+                username: normalizedUsername,
             },
         },
     });
@@ -58,12 +61,22 @@ export async function signupAction(data: SignupFormData) {
             await prisma.user.create({
                 data: {
                     id: authData.user.id,
-                    username,
-                    email,
+                    username: normalizedUsername,
+                    email: normalizedEmail,
                 },
             });
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to create user record:', error);
+
+            // Handle unique constraint violations (race condition protection)
+            if (error.code === 'P2002') {
+                const field = error.meta?.target?.[0];
+                return {
+                    error:
+                        field === 'email' ? AUTH_ERRORS.EMAIL_IN_USE : AUTH_ERRORS.USERNAME_TAKEN,
+                    field,
+                };
+            }
 
             return {
                 error: AUTH_ERRORS.ACCOUNT_CREATION_FAILED,
@@ -85,10 +98,12 @@ export async function loginAction(data: LoginFormData) {
 
     const { email, password } = result.data;
 
+    const normalizedEmail = email.toLowerCase().trim();
+
     const supabase = await createClient();
 
     const { error: authError } = await supabase.auth.signInWithPassword({
-        email,
+        email: normalizedEmail,
         password,
     });
 

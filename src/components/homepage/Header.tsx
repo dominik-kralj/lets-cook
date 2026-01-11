@@ -6,7 +6,7 @@ import { Link } from '../ui/Link';
 
 export function Header() {
     return (
-        <Container as="header" p={0} maxWidth="100%" position="relative">
+        <Container as="header" p={0} maxWidth="100%" position="relative" mb="section">
             <Image
                 src="/images/hero.jpg"
                 alt="Delicious home-cooked meal showcasing recipe management"

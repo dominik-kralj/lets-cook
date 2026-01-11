@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
+import { PasswordInput } from '@/components/chakra-ui/password-input';
 import { toaster } from '@/components/chakra-ui/toaster';
 import { FormCard } from '@/components/ui/FormCard';
 import { SignupFormData, signupSchema } from '@/models/user';
@@ -12,12 +13,12 @@ import { SignupFormData, signupSchema } from '@/models/user';
 import { signupAction } from '../actions';
 
 export function Signup() {
-    const router = useRouter();
+    const { push } = useRouter();
 
     const {
         register,
         handleSubmit,
-        formState: { errors, isSubmitting, isValid, isDirty },
+        formState: { errors, isSubmitting, isValid },
         reset,
         setError,
     } = useForm<SignupFormData>({
@@ -32,12 +33,12 @@ export function Signup() {
             if (response?.error) {
                 if (response.field === 'email') {
                     setError('email', {
-                        type: 'manual',
+                        type: 'server',
                         message: response.error,
                     });
                 } else if (response.field === 'username') {
                     setError('username', {
-                        type: 'manual',
+                        type: 'server',
                         message: response.error,
                     });
                 } else {
@@ -56,8 +57,8 @@ export function Signup() {
                 type: 'success',
             });
 
+            push('/auth?mode=login');
             reset();
-            router.push('/auth?mode=login');
         } catch (error: unknown) {
             console.error('Error caught:', error);
             toaster.create({
@@ -75,7 +76,7 @@ export function Signup() {
             onSubmit={handleSubmit(onSubmit)}
             submitButtonText="Sign Up"
             isSubmitting={isSubmitting}
-            isDisabled={!isDirty || !isValid || isSubmitting}
+            isDisabled={!isValid || isSubmitting}
             footerText="Already have an account?"
             footerLinkText="Log in"
             footerLinkHref="/auth?mode=login"
@@ -84,7 +85,13 @@ export function Signup() {
                 <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
                     Username
                 </Field.Label>
-                <Input type="text" placeholder="johndoe" {...register('username')} required />
+                <Input
+                    type="text"
+                    placeholder="johndoe"
+                    disabled={isSubmitting}
+                    required
+                    {...register('username')}
+                />
                 {errors.username && <Field.ErrorText>{errors.username.message}</Field.ErrorText>}
             </Field.Root>
 
@@ -92,7 +99,13 @@ export function Signup() {
                 <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
                     Email
                 </Field.Label>
-                <Input type="email" placeholder="your@email.com" {...register('email')} required />
+                <Input
+                    type="email"
+                    placeholder="your@email.com"
+                    disabled={isSubmitting}
+                    required
+                    {...register('email')}
+                />
                 {errors.email && <Field.ErrorText>{errors.email.message}</Field.ErrorText>}
             </Field.Root>
 
@@ -100,7 +113,12 @@ export function Signup() {
                 <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
                     Password
                 </Field.Label>
-                <Input type="password" placeholder="••••••••" {...register('password')} required />
+                <PasswordInput
+                    placeholder="••••••••"
+                    disabled={isSubmitting}
+                    required
+                    {...register('password')}
+                />
                 {errors.password && <Field.ErrorText>{errors.password.message}</Field.ErrorText>}
             </Field.Root>
 
@@ -108,11 +126,11 @@ export function Signup() {
                 <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
                     Confirm Password
                 </Field.Label>
-                <Input
-                    type="password"
+                <PasswordInput
                     placeholder="••••••••"
-                    {...register('confirmPassword')}
+                    disabled={isSubmitting}
                     required
+                    {...register('confirmPassword')}
                 />
                 {errors.confirmPassword && (
                     <Field.ErrorText>{errors.confirmPassword.message}</Field.ErrorText>
