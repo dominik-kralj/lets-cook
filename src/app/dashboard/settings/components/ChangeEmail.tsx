@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { LuMail } from 'react-icons/lu';
 
 import { toaster } from '@/components/chakra-ui/toaster';
+import { AUTH_ERRORS } from '@/lib/errors';
 import { ChangeEmailFormData, changeEmailSchema } from '@/models/user';
 
 import { changeEmailAction } from '../actions';
@@ -63,8 +64,7 @@ export function ChangeEmail({ currentEmail }: ChangeEmailProps) {
             console.error('Error changing email:', error);
 
             toaster.create({
-                title: 'Something went wrong',
-                description: 'Please try again later.',
+                title: AUTH_ERRORS.GENERIC,
                 type: 'error',
             });
         }

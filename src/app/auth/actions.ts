@@ -68,7 +68,6 @@ export async function signupAction(data: SignupFormData) {
         } catch (error: any) {
             console.error('Failed to create user record:', error);
 
-            // Handle unique constraint violations (race condition protection)
             if (error.code === 'P2002') {
                 const field = error.meta?.target?.[0];
                 return {

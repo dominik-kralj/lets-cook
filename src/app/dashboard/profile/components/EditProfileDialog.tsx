@@ -23,6 +23,7 @@ import { RiEditLine } from 'react-icons/ri';
 import { KeyedMutator } from 'swr';
 
 import { toaster } from '@/components/chakra-ui/toaster';
+import { AUTH_ERRORS } from '@/lib/errors';
 import { uploadAvatar } from '@/lib/supabase/utils';
 import { UpdateProfileFormData, updateProfileSchema } from '@/models/user';
 import { UserProfile } from '@/types/user';
@@ -129,8 +130,7 @@ export function EditProfileDialog({ profile, onUpdate }: EditProfileDialogProps)
             console.error('Error updating profile:', error);
 
             toaster.create({
-                title: 'Something went wrong',
-                description: 'Please try again later.',
+                title: AUTH_ERRORS.GENERIC,
                 type: 'error',
             });
         }

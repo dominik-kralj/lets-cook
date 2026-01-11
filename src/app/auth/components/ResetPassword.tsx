@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import { toaster } from '@/components/chakra-ui/toaster';
 import { FormCard } from '@/components/ui/FormCard';
 import { Link } from '@/components/ui/Link';
+import { AUTH_ERRORS } from '@/lib/errors';
 import { createClient } from '@/lib/supabase/client';
 import { ResetPasswordFormData, resetPasswordSchema } from '@/models/user';
 
@@ -93,9 +94,9 @@ export function ResetPassword() {
             setIsSuccess(true);
         } catch (error: any) {
             console.error('Error resetting password:', error);
+
             toaster.create({
-                title: 'Something went wrong',
-                description: 'Please try again later.',
+                title: AUTH_ERRORS.GENERIC,
                 type: 'error',
             });
         }

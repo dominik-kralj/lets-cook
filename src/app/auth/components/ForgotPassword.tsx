@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 
 import { toaster } from '@/components/chakra-ui/toaster';
 import { FormCard } from '@/components/ui/FormCard';
+import { AUTH_ERRORS } from '@/lib/errors';
 import { ForgotPasswordFormData, forgotPasswordSchema } from '@/models/user';
 
 import { forgotPasswordAction } from '../actions';
@@ -55,9 +56,9 @@ export function ForgotPassword() {
             }, 1000);
         } catch (error: unknown) {
             console.error('Error caught:', error);
+
             toaster.create({
-                title: 'Something went wrong',
-                description: 'Please try again later.',
+                title: AUTH_ERRORS.GENERIC,
                 type: 'error',
             });
         }

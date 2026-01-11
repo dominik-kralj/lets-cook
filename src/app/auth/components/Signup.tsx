@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import { PasswordInput } from '@/components/chakra-ui/password-input';
 import { toaster } from '@/components/chakra-ui/toaster';
 import { FormCard } from '@/components/ui/FormCard';
+import { AUTH_ERRORS } from '@/lib/errors';
 import { SignupFormData, signupSchema } from '@/models/user';
 
 import { signupAction } from '../actions';
@@ -30,24 +31,30 @@ export function Signup() {
         try {
             const response = await signupAction(data);
 
-            if (response?.error) {
+            if (!response) return;
+
+            if (response.error) {
                 if (response.field === 'email') {
                     setError('email', {
                         type: 'server',
                         message: response.error,
                     });
-                } else if (response.field === 'username') {
+                    return;
+                }
+
+                if (response.field === 'username') {
                     setError('username', {
                         type: 'server',
                         message: response.error,
                     });
-                } else {
-                    toaster.create({
-                        title: 'Signup failed',
-                        description: response.error,
-                        type: 'error',
-                    });
+                    return;
                 }
+
+                toaster.create({
+                    title: 'Signup failed',
+                    description: response.error,
+                    type: 'error',
+                });
                 return;
             }
 
@@ -61,9 +68,9 @@ export function Signup() {
             reset();
         } catch (error: unknown) {
             console.error('Error caught:', error);
+
             toaster.create({
-                title: 'Something went wrong',
-                description: 'Please try again later.',
+                title: AUTH_ERRORS.GENERIC,
                 type: 'error',
             });
         }

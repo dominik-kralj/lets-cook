@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import { toaster } from '@/components/chakra-ui/toaster';
 import { FormCard } from '@/components/ui/FormCard';
 import { Link } from '@/components/ui/Link';
+import { AUTH_ERRORS } from '@/lib/errors';
 import { LoginFormData, loginSchema } from '@/models/user';
 
 import { loginAction } from '../actions';
@@ -49,9 +50,9 @@ export function Login() {
             router.refresh();
         } catch (error: unknown) {
             console.error('Error caught:', error);
+
             toaster.create({
-                title: 'Something went wrong',
-                description: 'Please try again later.',
+                title: AUTH_ERRORS.GENERIC,
                 type: 'error',
             });
         }

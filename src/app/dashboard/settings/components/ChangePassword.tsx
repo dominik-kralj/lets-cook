@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { LuLock } from 'react-icons/lu';
 
 import { toaster } from '@/components/chakra-ui/toaster';
+import { AUTH_ERRORS } from '@/lib/errors';
 import { ChangePasswordFormData, changePasswordSchema } from '@/models/user';
 
 import { changePasswordAction } from '../actions';
@@ -43,9 +44,9 @@ export function ChangePassword() {
             reset();
         } catch (error) {
             console.error('Error changing password:', error);
+
             toaster.create({
-                title: 'Something went wrong',
-                description: 'Please try again later.',
+                title: AUTH_ERRORS.GENERIC,
                 type: 'error',
             });
         }
