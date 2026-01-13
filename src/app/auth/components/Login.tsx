@@ -70,7 +70,7 @@ export function Login() {
             footerLinkText="Sign up"
             footerLinkHref="/auth?mode=signup"
         >
-            <Field.Root invalid={!!errors.email} required>
+            <Field.Root invalid={Boolean(errors.email)} required>
                 <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
                     Email
                 </Field.Label>
@@ -78,7 +78,7 @@ export function Login() {
                 {errors.email && <Field.ErrorText>{errors.email.message}</Field.ErrorText>}
             </Field.Root>
 
-            <Field.Root invalid={!!errors.password} required>
+            <Field.Root invalid={Boolean(errors.password)} required>
                 <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
                     Password
                 </Field.Label>

@@ -1,11 +1,12 @@
 'use client';
 
-import { Button, Container, Field, Heading, Input, Spinner, Text, VStack } from '@chakra-ui/react';
+import { Button, Container, Field, Heading, Spinner, Text, VStack } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
+import { PasswordInput } from '@/components/chakra-ui/password-input';
 import { toaster } from '@/components/chakra-ui/toaster';
 import { FormCard } from '@/components/ui/FormCard';
 import { Link } from '@/components/ui/Link';
@@ -15,6 +16,7 @@ import { ResetPasswordFormData, resetPasswordSchema } from '@/models/user';
 
 export function ResetPassword() {
     const router = useRouter();
+
     const [isValidating, setIsValidating] = useState(true);
     const [isValid, setIsValid] = useState(false);
     const [countdown, setCountdown] = useState(0);
@@ -51,7 +53,7 @@ export function ResetPassword() {
         register,
         handleSubmit,
         setError,
-        formState: { errors, isSubmitting, isValid: isFormValid, isDirty },
+        formState: { errors, isSubmitting, isValid: isFormValid },
     } = useForm<ResetPasswordFormData>({
         resolver: zodResolver(resetPasswordSchema),
         mode: 'onChange',
@@ -109,15 +111,14 @@ export function ResetPassword() {
 
     if (isValidating) {
         return (
-            <Container maxW="md">
+            <Container maxW={{ base: 'sm', sm: 'md' }}>
                 <VStack
                     gap="section"
                     align="center"
-                    p={12}
+                    p={{ base: 8, sm: 12 }}
                     borderRadius="xl"
                     borderWidth="1px"
                     bg="fills.surfaces.cardElevated"
-                    boxShadow="sm"
                 >
                     <Spinner size="xl" />
                     <Text color="textAndIcons.onSurfaces.helper">Validating reset link...</Text>
@@ -128,21 +129,20 @@ export function ResetPassword() {
 
     if (isSuccess) {
         return (
-            <Container maxW="md">
+            <Container maxW={{ base: 'sm', sm: 'md' }}>
                 <VStack
                     gap="section"
                     align="stretch"
-                    p={12}
+                    p={{ base: 8, sm: 12 }}
                     borderRadius="xl"
                     borderWidth="1px"
                     bg="fills.surfaces.cardElevated"
-                    boxShadow="sm"
                 >
                     <VStack gap="component" textAlign="center">
-                        <Heading as="h2" fontSize="4xl" color="textAndIcons.onSurfaces.lead">
+                        <Heading as="h2" fontSize="3xl" color="textAndIcons.onSurfaces.lead">
                             Password Reset Successfully
                         </Heading>
-                        <Text color="textAndIcons.onSurfaces.helper" fontSize="lg">
+                        <Text color="textAndIcons.onSurfaces.helper">
                             Your password has been updated. You can now log in with your new
                             password.
                         </Text>
@@ -160,22 +160,20 @@ export function ResetPassword() {
 
     if (!isValid) {
         return (
-            <Container maxW="md">
+            <Container maxW={{ base: 'sm', sm: 'md' }}>
                 <VStack
                     gap="section"
                     align="stretch"
-                    p={12}
+                    p={{ base: 8, sm: 12 }}
                     borderRadius="xl"
                     borderWidth="1px"
-                    borderColor="outlines.withControlsNeutral.default"
                     bg="fills.surfaces.cardElevated"
-                    boxShadow="sm"
                 >
                     <VStack gap="component" textAlign="center">
-                        <Heading as="h2" fontSize="4xl" color="textAndIcons.onSurfaces.lead">
+                        <Heading as="h2" fontSize="3xl" color="textAndIcons.onSurfaces.lead">
                             Invalid Link
                         </Heading>
-                        <Text color="textAndIcons.onSurfaces.helper" fontSize="lg">
+                        <Text color="textAndIcons.onSurfaces.helper">
                             This password reset link is invalid or has expired.
                         </Text>
                     </VStack>
@@ -200,28 +198,33 @@ export function ResetPassword() {
             onSubmit={handleSubmit(onSubmit)}
             submitButtonText="Reset Password"
             isSubmitting={isSubmitting}
-            isDisabled={!isDirty || !isFormValid || isSubmitting}
+            isDisabled={!isFormValid || isSubmitting}
             footerText="Remember your password?"
             footerLinkText="Log in"
             footerLinkHref="/auth?mode=login"
         >
-            <Field.Root invalid={!!errors.password} required>
+            <Field.Root invalid={Boolean(errors.password)} required>
                 <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
                     New Password
                 </Field.Label>
 
-                <Input type="password" placeholder="••••••••" {...register('password')} required />
+                <PasswordInput
+                    placeholder="••••••••"
+                    disabled={isSubmitting}
+                    {...register('password')}
+                    required
+                />
                 {errors.password && <Field.ErrorText>{errors.password.message}</Field.ErrorText>}
             </Field.Root>
 
-            <Field.Root invalid={!!errors.confirmPassword} required>
+            <Field.Root invalid={Boolean(errors.confirmPassword)} required>
                 <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
                     Confirm New Password
                 </Field.Label>
 
-                <Input
-                    type="password"
+                <PasswordInput
                     placeholder="••••••••"
+                    disabled={isSubmitting}
                     {...register('confirmPassword')}
                     required
                 />

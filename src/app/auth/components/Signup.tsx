@@ -88,7 +88,7 @@ export function Signup() {
             footerLinkText="Log in"
             footerLinkHref="/auth?mode=login"
         >
-            <Field.Root invalid={!!errors.username} required>
+            <Field.Root invalid={Boolean(errors.username)} required>
                 <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
                     Username
                 </Field.Label>
@@ -102,7 +102,7 @@ export function Signup() {
                 {errors.username && <Field.ErrorText>{errors.username.message}</Field.ErrorText>}
             </Field.Root>
 
-            <Field.Root invalid={!!errors.email} required>
+            <Field.Root invalid={Boolean(errors.email)} required>
                 <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
                     Email
                 </Field.Label>
@@ -116,7 +116,7 @@ export function Signup() {
                 {errors.email && <Field.ErrorText>{errors.email.message}</Field.ErrorText>}
             </Field.Root>
 
-            <Field.Root invalid={!!errors.password} required>
+            <Field.Root invalid={Boolean(errors.password)} required>
                 <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
                     Password
                 </Field.Label>
@@ -129,7 +129,7 @@ export function Signup() {
                 {errors.password && <Field.ErrorText>{errors.password.message}</Field.ErrorText>}
             </Field.Root>
 
-            <Field.Root invalid={!!errors.confirmPassword} required>
+            <Field.Root invalid={Boolean(errors.confirmPassword)} required>
                 <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
                     Confirm Password
                 </Field.Label>

@@ -18,7 +18,7 @@ export function ForgotPassword() {
     const {
         register,
         handleSubmit,
-        formState: { errors, isSubmitting, isValid, isDirty },
+        formState: { errors, isSubmitting, isValid },
     } = useForm<ForgotPasswordFormData>({
         resolver: zodResolver(forgotPasswordSchema),
         mode: 'onBlur',
@@ -71,17 +71,23 @@ export function ForgotPassword() {
             onSubmit={handleSubmit(onSubmit)}
             submitButtonText={countdown > 0 ? `Resend in ${countdown}s` : 'Send Reset Link'}
             isSubmitting={isSubmitting}
-            isDisabled={!isDirty || !isValid || isSubmitting || countdown > 0}
+            isDisabled={!isValid || isSubmitting || countdown > 0}
             footerText="Remember your password?"
             footerLinkText="Log in"
             footerLinkHref="/auth?mode=login"
         >
-            <Field.Root invalid={!!errors.email} required>
+            <Field.Root invalid={Boolean(errors.email)} required>
                 <Field.Label color="textAndIcons.onSurfaces.lead" fontWeight="medium">
                     Email
                 </Field.Label>
 
-                <Input type="email" placeholder="your@email.com" {...register('email')} required />
+                <Input
+                    type="email"
+                    placeholder="your@email.com"
+                    disabled={isSubmitting}
+                    {...register('email')}
+                    required
+                />
 
                 {errors.email && <Field.ErrorText>{errors.email.message}</Field.ErrorText>}
             </Field.Root>
