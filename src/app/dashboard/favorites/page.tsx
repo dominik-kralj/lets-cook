@@ -1,8 +1,9 @@
 'use client';
 
-import { Box, Container, Heading, HStack, Icon, Spinner, Text, VStack } from '@chakra-ui/react';
+import { Box, Container, Heading, HStack, Icon, Text, VStack } from '@chakra-ui/react';
 import { RiHeartFill } from 'react-icons/ri';
 
+import Loading from '@/components/ui/Loading';
 import { useFavorites } from '@/hooks/useFavorites';
 
 import { DashboardLayout } from '../components/DashsboardLayout';
@@ -11,20 +12,7 @@ import { RecipeCard } from '../components/RecipeCard';
 export default function FavoritesPage() {
     const { favorites, isLoading, mutate } = useFavorites();
 
-    if (isLoading) {
-        return (
-            <DashboardLayout>
-                <Box
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center"
-                    h="calc(100vh - 200px)"
-                >
-                    <Spinner />
-                </Box>
-            </DashboardLayout>
-        );
-    }
+    if (isLoading) return <Loading />;
 
     return (
         <DashboardLayout scrollable={false}>

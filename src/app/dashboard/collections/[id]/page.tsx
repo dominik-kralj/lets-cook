@@ -1,15 +1,16 @@
 'use client';
 
-import { Box, Button, Container, Heading, Icon, Spinner, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Container, Heading, Icon, Text, VStack } from '@chakra-ui/react';
 import { useParams, useRouter } from 'next/navigation';
 import { RiArrowLeftLine } from 'react-icons/ri';
 import useSWR, { KeyedMutator } from 'swr';
 
+import Loading from '@/components/ui/Loading';
 import { Collection } from '@/types/collection';
 import { Recipe } from '@/types/recipe';
 
-import { RecipeCard } from '../../components/RecipeCard';
 import { DashboardLayout } from '../../components/DashsboardLayout';
+import { RecipeCard } from '../../components/RecipeCard';
 
 const fetchCollection = async (collectionId: string): Promise<Collection> => {
     const response = await fetch(`/api/collections/${collectionId}`);
@@ -24,9 +25,12 @@ export default function CollectionDetailPage() {
     const router = useRouter();
     const collectionId = params.id as string;
 
-    const { data: collection, mutate, isLoading } = useSWR<Collection>(
-        collectionId ? ['collection', collectionId] : null,
-        () => fetchCollection(collectionId),
+    const {
+        data: collection,
+        mutate,
+        isLoading,
+    } = useSWR<Collection>(collectionId ? ['collection', collectionId] : null, () =>
+        fetchCollection(collectionId),
     );
 
     const handleBack = () => {
@@ -41,20 +45,7 @@ export default function CollectionDetailPage() {
         }) as KeyedMutator<Recipe[]>;
     };
 
-    if (isLoading) {
-        return (
-            <DashboardLayout>
-                <Box
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center"
-                    h="calc(100vh - 200px)"
-                >
-                    <Spinner />
-                </Box>
-            </DashboardLayout>
-        );
-    }
+    if (isLoading) return <Loading />;
 
     return (
         <DashboardLayout>

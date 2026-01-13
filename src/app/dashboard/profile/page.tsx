@@ -9,13 +9,13 @@ import {
     Heading,
     HStack,
     Icon,
-    Spinner,
     Text,
     VStack,
 } from '@chakra-ui/react';
 import { RiFileListFill, RiFolderFill, RiHeartFill } from 'react-icons/ri';
 
 import { logoutAction } from '@/app/auth/actions';
+import Loading from '@/components/ui/Loading';
 import { useProfile } from '@/hooks/useProfile';
 import { formatDate } from '@/utils/helper';
 
@@ -25,20 +25,7 @@ import { EditProfileDialog } from './components/EditProfileDialog';
 export default function ProfilePage() {
     const { profile, isLoading, isError, mutate } = useProfile();
 
-    if (isLoading) {
-        return (
-            <DashboardLayout>
-                <Box
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center"
-                    h="calc(100vh - 200px)"
-                >
-                    <Spinner />
-                </Box>
-            </DashboardLayout>
-        );
-    }
+    if (isLoading) return <Loading />;
 
     if (isError || !profile) {
         logoutAction();

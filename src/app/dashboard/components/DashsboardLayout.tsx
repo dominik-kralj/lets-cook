@@ -9,7 +9,7 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, scrollable = true }: DashboardLayoutProps) {
     return (
-        <Flex h="100vh" overflow="hidden">
+        <Flex h="100vh" overflow="hidden" width="100%">
             <Sidebar />
 
             <Box

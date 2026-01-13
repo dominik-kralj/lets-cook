@@ -1,8 +1,9 @@
 'use client';
 
-import { Box, Container, Heading, Spinner, Text, VStack } from '@chakra-ui/react';
+import { Box, Container, Heading, Text, VStack } from '@chakra-ui/react';
 
 import { logoutAction } from '@/app/auth/actions';
+import Loading from '@/components/ui/Loading';
 import { useProfile } from '@/hooks/useProfile';
 
 import { DashboardLayout } from '../components/DashsboardLayout';
@@ -14,20 +15,7 @@ import { Logout } from './components/Logout';
 export default function SettingsPage() {
     const { profile, isLoading, isError } = useProfile();
 
-    if (isLoading) {
-        return (
-            <DashboardLayout>
-                <Box
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center"
-                    h="calc(100vh - 200px)"
-                >
-                    <Spinner />
-                </Box>
-            </DashboardLayout>
-        );
-    }
+    if (isLoading) return <Loading />;
 
     if (isError || !profile) {
         logoutAction();

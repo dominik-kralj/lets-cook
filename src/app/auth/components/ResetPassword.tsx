@@ -1,9 +1,9 @@
 'use client';
 
-import { Button, Container, Field, Heading, Spinner, Text, VStack } from '@chakra-ui/react';
+import { Button, Container, Field, Heading, Text, VStack } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { PasswordInput } from '@/components/chakra-ui/password-input';
@@ -15,39 +15,8 @@ import { createClient } from '@/lib/supabase/client';
 import { ResetPasswordFormData, resetPasswordSchema } from '@/models/user';
 
 export function ResetPassword() {
-    const router = useRouter();
-
-    const [isValidating, setIsValidating] = useState(true);
-    const [isValid, setIsValid] = useState(false);
-    const [countdown, setCountdown] = useState(0);
+    const { push } = useRouter();
     const [isSuccess, setIsSuccess] = useState(false);
-
-    useEffect(() => {
-        const checkAuth = async () => {
-            const supabase = createClient();
-            const {
-                data: { user },
-                error,
-            } = await supabase.auth.getUser();
-
-            if (user && !error) {
-                setIsValid(true);
-            } else {
-                setIsValid(false);
-            }
-
-            setIsValidating(false);
-        };
-
-        checkAuth();
-    }, []);
-
-    useEffect(() => {
-        if (countdown > 0) {
-            const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-            return () => clearTimeout(timer);
-        }
-    }, [countdown]);
 
     const {
         register,
@@ -79,6 +48,21 @@ export function ResetPassword() {
                     return;
                 }
 
+                if (
+                    error.message.toLowerCase().includes('session') ||
+                    error.message.toLowerCase().includes('token') ||
+                    error.message.toLowerCase().includes('expired')
+                ) {
+                    toaster.create({
+                        title: 'Reset link expired',
+                        description:
+                            'This password reset link has expired. Please request a new one.',
+                        type: 'error',
+                    });
+                    push('/auth/forgot-password');
+                    return;
+                }
+
                 toaster.create({
                     title: 'Failed to reset password',
                     description: error.message,
@@ -94,7 +78,7 @@ export function ResetPassword() {
             });
 
             setIsSuccess(true);
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Error resetting password:', error);
 
             toaster.create({
@@ -103,29 +87,6 @@ export function ResetPassword() {
             });
         }
     };
-
-    const handleRequestNewLink = () => {
-        setCountdown(30);
-        router.push('/auth/forgot-password');
-    };
-
-    if (isValidating) {
-        return (
-            <Container maxW={{ base: 'sm', sm: 'md' }}>
-                <VStack
-                    gap="section"
-                    align="center"
-                    p={{ base: 8, sm: 12 }}
-                    borderRadius="xl"
-                    borderWidth="1px"
-                    bg="fills.surfaces.cardElevated"
-                >
-                    <Spinner size="xl" />
-                    <Text color="textAndIcons.onSurfaces.helper">Validating reset link...</Text>
-                </VStack>
-            </Container>
-        );
-    }
 
     if (isSuccess) {
         return (
@@ -153,39 +114,6 @@ export function ResetPassword() {
                             Go to Login
                         </Button>
                     </Link>
-                </VStack>
-            </Container>
-        );
-    }
-
-    if (!isValid) {
-        return (
-            <Container maxW={{ base: 'sm', sm: 'md' }}>
-                <VStack
-                    gap="section"
-                    align="stretch"
-                    p={{ base: 8, sm: 12 }}
-                    borderRadius="xl"
-                    borderWidth="1px"
-                    bg="fills.surfaces.cardElevated"
-                >
-                    <VStack gap="component" textAlign="center">
-                        <Heading as="h2" fontSize="3xl" color="textAndIcons.onSurfaces.lead">
-                            Invalid Link
-                        </Heading>
-                        <Text color="textAndIcons.onSurfaces.helper">
-                            This password reset link is invalid or has expired.
-                        </Text>
-                    </VStack>
-
-                    <Button
-                        size="lg"
-                        width="full"
-                        onClick={handleRequestNewLink}
-                        disabled={countdown > 0}
-                    >
-                        {countdown > 0 ? `Request New Link (${countdown}s)` : 'Request New Link'}
-                    </Button>
                 </VStack>
             </Container>
         );

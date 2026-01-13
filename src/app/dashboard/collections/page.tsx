@@ -1,8 +1,9 @@
 'use client';
 
-import { Box, Container, Grid, Heading, HStack, Icon, Spinner, Text, VStack } from '@chakra-ui/react';
+import { Box, Container, Grid, Heading, HStack, Icon, Text, VStack } from '@chakra-ui/react';
 import { RiFolder2Line } from 'react-icons/ri';
 
+import Loading from '@/components/ui/Loading';
 import { useCollections } from '@/hooks/useCollections';
 import { Collection } from '@/types/collection';
 
@@ -13,20 +14,7 @@ import { CollectionCard } from './components/CollectionCard';
 export default function CollectionsPage() {
     const { collections, isLoading, mutate } = useCollections();
 
-    if (isLoading) {
-        return (
-            <DashboardLayout>
-                <Box
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center"
-                    h="calc(100vh - 200px)"
-                >
-                    <Spinner />
-                </Box>
-            </DashboardLayout>
-        );
-    }
+    if (isLoading) return <Loading />;
 
     return (
         <DashboardLayout>
@@ -60,49 +48,53 @@ export default function CollectionsPage() {
                         </Box>
                     </HStack>
 
-                {collections && collections.length > 0 ? (
-                    <Grid
-                        templateColumns={{
-                            base: '1fr',
-                            md: 'repeat(2, 1fr)',
-                            lg: 'repeat(3, 1fr)',
-                        }}
-                        gap="component"
-                    >
-                        {collections.map((collection: Collection) => (
-                            <CollectionCard
-                                key={collection.id}
-                                collection={collection}
-                                onCollectionDelete={mutate}
-                                onCollectionEdit={mutate}
-                            />
-                        ))}
-                    </Grid>
-                ) : (
-                    <Box
-                        display="flex"
-                        flexDirection="column"
-                        alignItems="center"
-                        justifyContent="center"
-                        py="section"
-                        textAlign="center"
-                    >
-                        <Icon fontSize="6xl" color="textAndIcons.onSurfaces.subdued" mb="component">
-                            <RiFolder2Line />
-                        </Icon>
-                        <Heading
-                            as="h3"
-                            fontSize="xl"
-                            color="textAndIcons.onSurfaces.lead"
-                            mb="tight"
+                    {collections && collections.length > 0 ? (
+                        <Grid
+                            templateColumns={{
+                                base: '1fr',
+                                md: 'repeat(2, 1fr)',
+                                lg: 'repeat(3, 1fr)',
+                            }}
+                            gap="component"
                         >
-                            No collections yet
-                        </Heading>
-                        <Text color="textAndIcons.onSurfaces.helper" mb="component" maxW="md">
-                            Start organizing your recipes by creating your first collection
-                        </Text>
-                    </Box>
-                )}
+                            {collections.map((collection: Collection) => (
+                                <CollectionCard
+                                    key={collection.id}
+                                    collection={collection}
+                                    onCollectionDelete={mutate}
+                                    onCollectionEdit={mutate}
+                                />
+                            ))}
+                        </Grid>
+                    ) : (
+                        <Box
+                            display="flex"
+                            flexDirection="column"
+                            alignItems="center"
+                            justifyContent="center"
+                            py="section"
+                            textAlign="center"
+                        >
+                            <Icon
+                                fontSize="6xl"
+                                color="textAndIcons.onSurfaces.subdued"
+                                mb="component"
+                            >
+                                <RiFolder2Line />
+                            </Icon>
+                            <Heading
+                                as="h3"
+                                fontSize="xl"
+                                color="textAndIcons.onSurfaces.lead"
+                                mb="tight"
+                            >
+                                No collections yet
+                            </Heading>
+                            <Text color="textAndIcons.onSurfaces.helper" mb="component" maxW="md">
+                                Start organizing your recipes by creating your first collection
+                            </Text>
+                        </Box>
+                    )}
                 </VStack>
             </Container>
         </DashboardLayout>

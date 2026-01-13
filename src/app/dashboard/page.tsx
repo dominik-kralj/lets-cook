@@ -1,19 +1,10 @@
 'use client';
 
-import {
-    Box,
-    Container,
-    Heading,
-    HStack,
-    Icon,
-    Input,
-    Spinner,
-    Text,
-    VStack,
-} from '@chakra-ui/react';
+import { Box, Container, Heading, HStack, Icon, Input, Text, VStack } from '@chakra-ui/react';
 import { useState } from 'react';
 import { RiRestaurantLine, RiSearchLine } from 'react-icons/ri';
 
+import Loading from '@/components/ui/Loading';
 import { useProfile } from '@/hooks/useProfile';
 import { useRecipes } from '@/hooks/useRecipes';
 import { Recipe } from '@/types/recipe';
@@ -29,20 +20,7 @@ export default function RecipesPage() {
 
     const [searchQuery, setSearchQuery] = useState('');
 
-    if (isProfileLoading || isRecipesLoading) {
-        return (
-            <DashboardLayout>
-                <Box
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center"
-                    h="calc(100vh - 200px)"
-                >
-                    <Spinner />
-                </Box>
-            </DashboardLayout>
-        );
-    }
+    if (isProfileLoading || isRecipesLoading) return <Loading />;
 
     if (isError || !profile) {
         logoutAction();

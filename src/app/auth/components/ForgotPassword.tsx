@@ -2,18 +2,18 @@
 
 import { Field, Input } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { toaster } from '@/components/chakra-ui/toaster';
 import { FormCard } from '@/components/ui/FormCard';
+import { useCountdown } from '@/hooks/useCountdown';
 import { AUTH_ERRORS } from '@/lib/errors';
 import { ForgotPasswordFormData, forgotPasswordSchema } from '@/models/user';
 
 import { forgotPasswordAction } from '../actions';
 
 export function ForgotPassword() {
-    const [countdown, setCountdown] = useState(0);
+    const { countdown, startCountdown } = useCountdown();
 
     const {
         register,
@@ -43,17 +43,7 @@ export function ForgotPassword() {
                 type: 'success',
             });
 
-            setCountdown(60);
-
-            const timer = setInterval(() => {
-                setCountdown((prev) => {
-                    if (prev <= 1) {
-                        clearInterval(timer);
-                        return 0;
-                    }
-                    return prev - 1;
-                });
-            }, 1000);
+            startCountdown(60);
         } catch (error: unknown) {
             console.error('Error caught:', error);
 
