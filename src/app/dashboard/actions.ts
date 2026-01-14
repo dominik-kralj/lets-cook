@@ -22,6 +22,17 @@ export async function createRecipeAction(data: RecipeFormData) {
             return { error: 'Unauthorized' };
         }
 
+        const existingRecipe = await db.recipe.findFirst({
+            where: {
+                userId: user.id,
+                title: data.title,
+            },
+        });
+
+        if (existingRecipe) {
+            return { error: 'A recipe with this title already exists' };
+        }
+
         const ingredients = data.ingredients.map((item) => item.value);
         const instructions = data.instructions.map((item) => item.value);
 
@@ -95,6 +106,22 @@ export async function updateRecipeAction(recipeId: string, updates: Partial<Reci
 
         if (userError || !user) {
             return { success: false, error: 'Unauthorized' };
+        }
+
+        if (updates.title !== undefined) {
+            const existingRecipe = await db.recipe.findFirst({
+                where: {
+                    userId: user.id,
+                    title: updates.title,
+                    NOT: {
+                        id: recipeId,
+                    },
+                },
+            });
+
+            if (existingRecipe) {
+                return { success: false, error: 'A recipe with this title already exists' };
+            }
         }
 
         const updateData: {

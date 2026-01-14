@@ -15,6 +15,17 @@ export async function createCollectionAction(data: { name: string; description?:
             return { success: false, error: 'Unauthorized' };
         }
 
+        const { data: existingCollection } = await supabase
+            .from('collections')
+            .select('id')
+            .eq('userId', user.id)
+            .eq('name', data.name)
+            .single();
+
+        if (existingCollection) {
+            return { success: false, error: 'A collection with this name already exists' };
+        }
+
         const { data: collection, error } = await supabase
             .from('collections')
             .insert({
@@ -51,6 +62,20 @@ export async function updateCollectionAction(
 
         if (userError || !user) {
             return { success: false, error: 'Unauthorized' };
+        }
+
+        if (data.name !== undefined) {
+            const { data: existingCollection } = await supabase
+                .from('collections')
+                .select('id')
+                .eq('userId', user.id)
+                .eq('name', data.name)
+                .neq('id', collectionId)
+                .single();
+
+            if (existingCollection) {
+                return { success: false, error: 'A collection with this name already exists' };
+            }
         }
 
         const updateData: { name?: string; description?: string | null } = {};
