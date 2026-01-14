@@ -54,8 +54,13 @@ export function DeleteCollectionDialog({
     };
 
     return (
-        <Dialog.Root open={open} onOpenChange={handleOpenChange} placement="center" size="sm">
-            <Dialog.Trigger asChild onClick={(e) => e.stopPropagation()}>
+        <Dialog.Root
+            open={open}
+            onOpenChange={handleOpenChange}
+            placement="center"
+            size={{ base: 'xs', sm: 'sm' }}
+        >
+            <Dialog.Trigger asChild>
                 <IconButton
                     aria-label="Delete collection"
                     variant="subtle"
@@ -69,7 +74,7 @@ export function DeleteCollectionDialog({
 
             <Portal>
                 <Dialog.Backdrop />
-                <Dialog.Positioner>
+                <Dialog.Positioner px={{ base: 'element', md: 0 }}>
                     <Dialog.Content>
                         <Dialog.CloseTrigger asChild>
                             <CloseButton size="sm" />
@@ -85,14 +90,22 @@ export function DeleteCollectionDialog({
                             </Text>
                         </Dialog.Body>
 
-                        <Dialog.Footer>
+                        <Dialog.Footer gap="element" flexDir={{ base: 'column', sm: 'row' }}>
                             <Dialog.ActionTrigger asChild>
-                                <Button variant="outline" type="button">
+                                <Button
+                                    variant="outline"
+                                    type="button"
+                                    w={{ base: 'full', sm: 'auto' }}
+                                >
                                     Cancel
                                 </Button>
                             </Dialog.ActionTrigger>
 
-                            <Button loading={isPending} onClick={handleCollectionDelete}>
+                            <Button
+                                loading={isPending}
+                                onClick={handleCollectionDelete}
+                                w={{ base: 'full', sm: 'auto' }}
+                            >
                                 Delete
                             </Button>
                         </Dialog.Footer>

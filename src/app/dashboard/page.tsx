@@ -75,6 +75,7 @@ export default function RecipesPage() {
                             >
                                 <RiSearchLine />
                             </Icon>
+
                             <Input
                                 placeholder="Search recipes..."
                                 value={searchQuery}

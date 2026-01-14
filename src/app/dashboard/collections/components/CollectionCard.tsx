@@ -1,8 +1,8 @@
 'use client';
 
-import { Box, Flex, Grid, Icon, IconButton, Image, Text } from '@chakra-ui/react';
+import { Box, Flex, Grid, Icon, Image, Text } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
-import { RiEdit2Line, RiFolder2Line } from 'react-icons/ri';
+import { RiFolder2Line } from 'react-icons/ri';
 import { KeyedMutator } from 'swr';
 
 import { Collection } from '@/types/collection';
@@ -57,16 +57,8 @@ export function CollectionCard({
                 gap="tight"
                 onClick={(e) => e.stopPropagation()}
             >
-                <EditCollectionDialog collection={collection} onCollectionEdit={onCollectionEdit}>
-                    <IconButton
-                        aria-label="Edit collection"
-                        variant="subtle"
-                        size="xs"
-                        rounded="full"
-                    >
-                        <RiEdit2Line />
-                    </IconButton>
-                </EditCollectionDialog>
+                <EditCollectionDialog collection={collection} onCollectionEdit={onCollectionEdit} />
+
                 <DeleteCollectionDialog
                     collectionName={collection.name}
                     collectionId={collection.id}

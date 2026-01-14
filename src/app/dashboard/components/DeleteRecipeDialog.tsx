@@ -54,7 +54,7 @@ export function DeleteRecipeDialog({
     };
 
     return (
-        <Dialog.Root open={open} onOpenChange={handleOpenChange} placement="center" size="sm">
+        <Dialog.Root open={open} onOpenChange={handleOpenChange} placement="center" size={{ base: 'xs', sm: 'sm' }}>
             <Dialog.Trigger asChild>
                 <IconButton
                     aria-label="Delete recipe"
@@ -69,7 +69,7 @@ export function DeleteRecipeDialog({
 
             <Portal>
                 <Dialog.Backdrop />
-                <Dialog.Positioner>
+                <Dialog.Positioner px={{ base: 'element', md: 0 }}>
                     <Dialog.Content>
                         <Dialog.CloseTrigger asChild>
                             <CloseButton size="sm" />
@@ -85,14 +85,14 @@ export function DeleteRecipeDialog({
                             </Text>
                         </Dialog.Body>
 
-                        <Dialog.Footer>
+                        <Dialog.Footer gap="element" flexDir={{ base: 'column', sm: 'row' }}>
                             <Dialog.ActionTrigger asChild>
-                                <Button variant="outline" type="button">
+                                <Button variant="outline" type="button" w={{ base: 'full', sm: 'auto' }}>
                                     Cancel
                                 </Button>
                             </Dialog.ActionTrigger>
 
-                            <Button loading={isPending} onClick={handleRecipeDelete}>
+                            <Button loading={isPending} onClick={handleRecipeDelete} w={{ base: 'full', sm: 'auto' }}>
                                 Delete
                             </Button>
                         </Dialog.Footer>

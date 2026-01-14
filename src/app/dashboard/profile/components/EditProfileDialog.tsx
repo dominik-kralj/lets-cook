@@ -158,7 +158,7 @@ export function EditProfileDialog({ profile, onUpdate }: EditProfileDialogProps)
     const hasChanges = isDirty || avatarFile !== null;
 
     return (
-        <Dialog.Root open={open} onOpenChange={handleOpenChange} placement="center">
+        <Dialog.Root open={open} onOpenChange={handleOpenChange} placement="center" size={{ base: 'full', md: 'md' }}>
             <Dialog.Trigger asChild>
                 <IconButton aria-label="Edit profile" size={{ base: 'md', md: 'lg' }}>
                     <RiEditLine />
@@ -168,14 +168,14 @@ export function EditProfileDialog({ profile, onUpdate }: EditProfileDialogProps)
             <Portal>
                 <Dialog.Backdrop />
 
-                <Dialog.Positioner px={{ base: 'element', md: 0 }}>
-                    <Dialog.Content>
+                <Dialog.Positioner>
+                    <Dialog.Content borderRadius={{ base: 0, md: 'lg' }}>
                         <Dialog.CloseTrigger asChild position="absolute" top="2" right="2">
                             <CloseButton size="sm" />
                         </Dialog.CloseTrigger>
 
-                        <Dialog.Header>
-                            <Dialog.Title>Edit Profile</Dialog.Title>
+                        <Dialog.Header pb={{ base: 'element', md: 'component' }}>
+                            <Dialog.Title fontSize={{ base: 'lg', md: 'xl' }}>Edit Profile</Dialog.Title>
                         </Dialog.Header>
 
                         <form onSubmit={handleSubmit(onSubmit)}>
@@ -259,15 +259,16 @@ export function EditProfileDialog({ profile, onUpdate }: EditProfileDialogProps)
                                 </VStack>
                             </Dialog.Body>
 
-                            <Dialog.Footer>
+                            <Dialog.Footer gap="element" flexDir={{ base: 'column', sm: 'row' }}>
                                 <Dialog.ActionTrigger asChild>
-                                    <Button variant="outline">Cancel</Button>
+                                    <Button variant="outline" w={{ base: 'full', sm: 'auto' }}>Cancel</Button>
                                 </Dialog.ActionTrigger>
 
                                 <Button
                                     type="submit"
                                     loading={isSubmitting}
                                     disabled={!hasChanges || !isValid}
+                                    w={{ base: 'full', sm: 'auto' }}
                                 >
                                     Save Changes
                                 </Button>

@@ -81,7 +81,9 @@ export function EditRecipeDialog({ recipe, onRecipeEdit, children }: EditRecipeD
                 description: recipe.description || '',
                 imageUrl: recipe.imageUrl || '',
                 ingredients: recipe.ingredients?.map((ing) => ({ value: ing })) || [{ value: '' }],
-                instructions: recipe.instructions?.map((inst) => ({ value: inst })) || [{ value: '' }],
+                instructions: recipe.instructions?.map((inst) => ({ value: inst })) || [
+                    { value: '' },
+                ],
                 collectionIds: recipeCollectionIds,
             });
         }
@@ -198,23 +200,44 @@ export function EditRecipeDialog({ recipe, onRecipeEdit, children }: EditRecipeD
     };
 
     return (
-        <Dialog.Root open={open} onOpenChange={handleOpenChange} placement="center" size="lg">
+        <Dialog.Root
+            open={open}
+            onOpenChange={handleOpenChange}
+            placement="center"
+            size={{ base: 'full', md: 'lg' }}
+        >
             {children && <Dialog.Trigger asChild>{children}</Dialog.Trigger>}
 
             <Portal>
                 <Dialog.Backdrop />
 
-                <Dialog.Positioner px={{ base: 'element', md: 0 }}>
-                    <Dialog.Content minH="500px">
-                        <Dialog.Header>
-                            <Dialog.Title>Edit Recipe</Dialog.Title>
+                <Dialog.Positioner>
+                    <Dialog.Content
+                        minH={{ base: '100vh', md: 'auto' }}
+                        maxH={{ base: '100vh', md: '85vh' }}
+                        borderRadius={{ base: 0, md: 'lg' }}
+                        display="flex"
+                        flexDirection="column"
+                    >
+                        <Dialog.Header pb={{ base: 'element', md: 'component' }}>
+                            <Dialog.Title fontSize={{ base: 'lg', md: 'xl' }}>
+                                Edit Recipe
+                            </Dialog.Title>
                             <Dialog.CloseTrigger asChild>
                                 <CloseButton size="sm" disabled={isSubmitting} />
                             </Dialog.CloseTrigger>
                         </Dialog.Header>
 
-                        <form onSubmit={handleSubmit(onSubmit)}>
-                            <Dialog.Body>
+                        <form
+                            onSubmit={handleSubmit(onSubmit)}
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                flex: 1,
+                                overflow: 'hidden',
+                            }}
+                        >
+                            <Dialog.Body overflowY="auto" flex="1">
                                 <Tabs.Root defaultValue="details" fitted>
                                     <Tabs.List mb="component">
                                         <Tabs.Trigger value="details" disabled={isSubmitting}>
@@ -381,7 +404,9 @@ export function EditRecipeDialog({ recipe, onRecipeEdit, children }: EditRecipeD
                                             </Field.Root>
 
                                             <Field.Root>
-                                                <Field.Label>Add to Collections (optional)</Field.Label>
+                                                <Field.Label>
+                                                    Add to Collections (optional)
+                                                </Field.Label>
                                                 <Controller
                                                     name="collectionIds"
                                                     control={control}
@@ -392,25 +417,33 @@ export function EditRecipeDialog({ recipe, onRecipeEdit, children }: EditRecipeD
                                                             disabled={isSubmitting}
                                                         >
                                                             <Stack gap="element">
-                                                                {collections && collections.length > 0 ? (
-                                                                    collections.map((collection) => (
-                                                                        <Checkbox.Root
-                                                                            key={collection.id}
-                                                                            value={collection.id}
-                                                                        >
-                                                                            <Checkbox.HiddenInput />
-                                                                            <Checkbox.Control />
-                                                                            <Checkbox.Label>
-                                                                                {collection.name}
-                                                                            </Checkbox.Label>
-                                                                        </Checkbox.Root>
-                                                                    ))
+                                                                {collections &&
+                                                                collections.length > 0 ? (
+                                                                    collections.map(
+                                                                        (collection) => (
+                                                                            <Checkbox.Root
+                                                                                key={collection.id}
+                                                                                value={
+                                                                                    collection.id
+                                                                                }
+                                                                            >
+                                                                                <Checkbox.HiddenInput />
+                                                                                <Checkbox.Control />
+                                                                                <Checkbox.Label>
+                                                                                    {
+                                                                                        collection.name
+                                                                                    }
+                                                                                </Checkbox.Label>
+                                                                            </Checkbox.Root>
+                                                                        ),
+                                                                    )
                                                                 ) : (
                                                                     <Text
                                                                         fontSize="sm"
                                                                         color="textAndIcons.onSurfaces.subdued"
                                                                     >
-                                                                        No collections yet. Create a collection first.
+                                                                        No collections yet. Create a
+                                                                        collection first.
                                                                     </Text>
                                                                 )}
                                                             </Stack>
@@ -571,12 +604,13 @@ export function EditRecipeDialog({ recipe, onRecipeEdit, children }: EditRecipeD
                                 </Tabs.Root>
                             </Dialog.Body>
 
-                            <Dialog.Footer>
+                            <Dialog.Footer gap="element" flexDir={{ base: 'column', sm: 'row' }}>
                                 <Button
                                     variant="outline"
                                     type="button"
                                     onClick={() => setOpen(false)}
                                     disabled={isSubmitting}
+                                    w={{ base: 'full', sm: 'auto' }}
                                 >
                                     Cancel
                                 </Button>
@@ -584,6 +618,7 @@ export function EditRecipeDialog({ recipe, onRecipeEdit, children }: EditRecipeD
                                     type="submit"
                                     loading={isSubmitting}
                                     disabled={!isValid || isSubmitting || (!isDirty && !imageFile)}
+                                    w={{ base: 'full', sm: 'auto' }}
                                 >
                                     Update Recipe
                                 </Button>

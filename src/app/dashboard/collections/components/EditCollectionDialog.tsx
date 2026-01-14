@@ -5,6 +5,7 @@ import {
     CloseButton,
     Dialog,
     Field,
+    IconButton,
     Input,
     Portal,
     Textarea,
@@ -13,10 +14,11 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { RiEdit2Line } from 'react-icons/ri';
 import { KeyedMutator } from 'swr';
 
 import { toaster } from '@/components/chakra-ui/toaster';
-import { collectionSchema, CollectionFormData } from '@/models/collection';
+import { CollectionFormData, collectionSchema } from '@/models/collection';
 import { Collection } from '@/types/collection';
 
 import { updateCollectionAction } from '../actions';
@@ -24,14 +26,9 @@ import { updateCollectionAction } from '../actions';
 interface EditCollectionDialogProps {
     collection: Collection;
     onCollectionEdit: KeyedMutator<Collection[]>;
-    children?: React.ReactNode;
 }
 
-export function EditCollectionDialog({
-    collection,
-    onCollectionEdit,
-    children,
-}: EditCollectionDialogProps) {
+export function EditCollectionDialog({ collection, onCollectionEdit }: EditCollectionDialogProps) {
     const [open, setOpen] = useState(false);
 
     const {
@@ -94,25 +91,34 @@ export function EditCollectionDialog({
     };
 
     return (
-        <Dialog.Root open={open} onOpenChange={handleOpenChange} placement="center" size="md">
-            <Dialog.Trigger asChild onClick={(e) => e.stopPropagation()}>
-                {children}
+        <Dialog.Root open={open} onOpenChange={handleOpenChange} placement="center" size="sm">
+            <Dialog.Trigger asChild>
+                <IconButton aria-label="Edit collection" variant="subtle" size="xs" rounded="full">
+                    <RiEdit2Line />
+                </IconButton>
             </Dialog.Trigger>
 
             <Portal>
                 <Dialog.Backdrop />
 
-                <Dialog.Positioner px={{ base: 'element', md: 0 }}>
-                    <Dialog.Content>
-                        <Dialog.Header>
-                            <Dialog.Title>Edit Collection</Dialog.Title>
+                <Dialog.Positioner>
+                    <Dialog.Content
+                        borderRadius={{ base: 0, md: 'lg' }}
+                        h={{ base: '100vh', md: 'auto' }}
+                        display={{ base: 'flex', md: 'block' }}
+                        flexDirection={{ base: 'column', md: 'initial' }}
+                    >
+                        <Dialog.Header pb={{ base: 'element', md: 'component' }} flexShrink={0}>
+                            <Dialog.Title fontSize={{ base: 'lg', md: 'xl' }}>
+                                Edit Collection
+                            </Dialog.Title>
                             <Dialog.CloseTrigger asChild>
                                 <CloseButton size="sm" disabled={isSubmitting} />
                             </Dialog.CloseTrigger>
                         </Dialog.Header>
 
-                        <form onSubmit={handleSubmit(onSubmit)}>
-                            <Dialog.Body>
+                        <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'contents' }}>
+                            <Dialog.Body flex={{ base: '1', md: 'initial' }} overflowY="auto">
                                 <VStack align="stretch" gap="component">
                                     <Field.Root required invalid={!!errors.name}>
                                         <Field.Label>Collection Name</Field.Label>
@@ -143,12 +149,17 @@ export function EditCollectionDialog({
                                 </VStack>
                             </Dialog.Body>
 
-                            <Dialog.Footer>
+                            <Dialog.Footer
+                                gap="element"
+                                flexDir={{ base: 'column', sm: 'row' }}
+                                flexShrink={0}
+                            >
                                 <Button
                                     variant="outline"
                                     type="button"
                                     onClick={() => setOpen(false)}
                                     disabled={isSubmitting}
+                                    w={{ base: 'full', sm: 'auto' }}
                                 >
                                     Cancel
                                 </Button>
@@ -156,6 +167,7 @@ export function EditCollectionDialog({
                                     type="submit"
                                     loading={isSubmitting}
                                     disabled={!isValid || isSubmitting}
+                                    w={{ base: 'full', sm: 'auto' }}
                                 >
                                     Save Changes
                                 </Button>

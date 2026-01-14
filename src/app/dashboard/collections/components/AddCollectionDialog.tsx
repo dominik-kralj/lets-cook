@@ -78,7 +78,7 @@ export function AddCollectionDialog({ onCollectionAdd }: AddCollectionDialogProp
     };
 
     return (
-        <Dialog.Root open={open} onOpenChange={handleOpenChange} placement="center" size="md">
+        <Dialog.Root open={open} onOpenChange={handleOpenChange} placement="center" size="sm">
             <Dialog.Trigger asChild>
                 <Button size={{ base: 'sm', md: 'md' }}>
                     <RiAddLine />
@@ -89,17 +89,24 @@ export function AddCollectionDialog({ onCollectionAdd }: AddCollectionDialogProp
             <Portal>
                 <Dialog.Backdrop />
 
-                <Dialog.Positioner px={{ base: 'element', md: 0 }}>
-                    <Dialog.Content>
-                        <Dialog.Header>
-                            <Dialog.Title>Add New Collection</Dialog.Title>
+                <Dialog.Positioner>
+                    <Dialog.Content
+                        borderRadius={{ base: 0, md: 'lg' }}
+                        h={{ base: '100vh', md: 'auto' }}
+                        display={{ base: 'flex', md: 'block' }}
+                        flexDirection={{ base: 'column', md: 'initial' }}
+                    >
+                        <Dialog.Header pb={{ base: 'element', md: 'component' }} flexShrink={0}>
+                            <Dialog.Title fontSize={{ base: 'lg', md: 'xl' }}>
+                                Add New Collection
+                            </Dialog.Title>
                             <Dialog.CloseTrigger asChild>
                                 <CloseButton size="sm" disabled={isSubmitting} />
                             </Dialog.CloseTrigger>
                         </Dialog.Header>
 
-                        <form onSubmit={handleSubmit(onSubmit)}>
-                            <Dialog.Body>
+                        <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'contents' }}>
+                            <Dialog.Body flex={{ base: '1', md: 'initial' }} overflowY="auto">
                                 <VStack align="stretch" gap="component">
                                     <Field.Root required invalid={!!errors.name}>
                                         <Field.Label>Collection Name</Field.Label>
@@ -130,12 +137,17 @@ export function AddCollectionDialog({ onCollectionAdd }: AddCollectionDialogProp
                                 </VStack>
                             </Dialog.Body>
 
-                            <Dialog.Footer>
+                            <Dialog.Footer
+                                gap="element"
+                                flexDir={{ base: 'column', sm: 'row' }}
+                                flexShrink={0}
+                            >
                                 <Button
                                     variant="outline"
                                     type="button"
                                     onClick={() => setOpen(false)}
                                     disabled={isSubmitting}
+                                    w={{ base: 'full', sm: 'auto' }}
                                 >
                                     Cancel
                                 </Button>
@@ -143,6 +155,7 @@ export function AddCollectionDialog({ onCollectionAdd }: AddCollectionDialogProp
                                     type="submit"
                                     loading={isSubmitting}
                                     disabled={!isValid || isSubmitting}
+                                    w={{ base: 'full', sm: 'auto' }}
                                 >
                                     Create Collection
                                 </Button>

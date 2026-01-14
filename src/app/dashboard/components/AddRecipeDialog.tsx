@@ -161,7 +161,7 @@ export function AddRecipeDialog({ onRecipeAdd }: AddRecipeDialogProps) {
     };
 
     return (
-        <Dialog.Root open={open} onOpenChange={handleOpenChange} placement="center" size="lg">
+        <Dialog.Root open={open} onOpenChange={handleOpenChange} placement="center" size={{ base: 'full', md: 'lg' }}>
             <Dialog.Trigger asChild>
                 <Button size={{ base: 'sm', md: 'md' }} w="full">
                     <RiAddLine />
@@ -172,17 +172,23 @@ export function AddRecipeDialog({ onRecipeAdd }: AddRecipeDialogProps) {
             <Portal>
                 <Dialog.Backdrop />
 
-                <Dialog.Positioner px={{ base: 'element', md: 0 }}>
-                    <Dialog.Content minH="500px">
-                        <Dialog.Header>
-                            <Dialog.Title>Add New Recipe</Dialog.Title>
+                <Dialog.Positioner>
+                    <Dialog.Content
+                        minH={{ base: '100vh', md: 'auto' }}
+                        maxH={{ base: '100vh', md: '85vh' }}
+                        borderRadius={{ base: 0, md: 'lg' }}
+                        display="flex"
+                        flexDirection="column"
+                    >
+                        <Dialog.Header pb={{ base: 'element', md: 'component' }}>
+                            <Dialog.Title fontSize={{ base: 'lg', md: 'xl' }}>Add New Recipe</Dialog.Title>
                             <Dialog.CloseTrigger asChild>
                                 <CloseButton size="sm" disabled={isSubmitting} />
                             </Dialog.CloseTrigger>
                         </Dialog.Header>
 
-                        <form onSubmit={handleSubmit(onSubmit)}>
-                            <Dialog.Body>
+                        <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
+                            <Dialog.Body overflowY="auto" flex="1">
                                 <Tabs.Root defaultValue="details" fitted>
                                     <Tabs.List mb="component">
                                         <Tabs.Trigger value="details" disabled={isSubmitting}>
@@ -529,12 +535,13 @@ export function AddRecipeDialog({ onRecipeAdd }: AddRecipeDialogProps) {
                                 </Tabs.Root>
                             </Dialog.Body>
 
-                            <Dialog.Footer>
+                            <Dialog.Footer gap="element" flexDir={{ base: 'column', sm: 'row' }}>
                                 <Button
                                     variant="outline"
                                     type="button"
                                     onClick={() => setOpen(false)}
                                     disabled={isSubmitting}
+                                    w={{ base: 'full', sm: 'auto' }}
                                 >
                                     Cancel
                                 </Button>
@@ -542,6 +549,7 @@ export function AddRecipeDialog({ onRecipeAdd }: AddRecipeDialogProps) {
                                     type="submit"
                                     loading={isSubmitting}
                                     disabled={!isValid || isSubmitting}
+                                    w={{ base: 'full', sm: 'auto' }}
                                 >
                                     Create Recipe
                                 </Button>
